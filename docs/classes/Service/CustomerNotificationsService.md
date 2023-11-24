@@ -1,6 +1,6 @@
 # CommonGateway\CustomerNotificationsBundle\Service\CustomerNotificationsService  
 
-An example service for adding business logic to your class.
+
 
 
 
@@ -11,7 +11,7 @@ An example service for adding business logic to your class.
 | Name | Description |
 |------|-------------|
 |[__construct](#customernotificationsservice__construct)||
-|[customerNotificationsHandler](#customernotificationsservicecustomernotificationshandler)|An example handler that is triggered by an action.|
+|[customerNotificationsHandler](#customernotificationsservicecustomernotificationshandler)||
 
 
 
@@ -45,25 +45,20 @@ An example service for adding business logic to your class.
 **Description**
 
 ```php
-public customerNotificationsHandler (array $data, array $configuration)
+ customerNotificationsHandler (void)
 ```
 
-An example handler that is triggered by an action. 
+ 
 
  
 
 **Parameters**
 
-* `(array) $data`
-: The data array  
-* `(array) $configuration`
-: The configuration array  
+`This function has no parameters.`
 
 **Return Values**
 
-`array`
-
-> A handler must ALWAYS return an array
+`void`
 
 
 <hr />
