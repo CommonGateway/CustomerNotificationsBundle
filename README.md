@@ -18,7 +18,7 @@ The Composer method in the terminal and root folder:
 
 > for the installation of schemas
 
-\`$php bin/console commongateway:install common-gateway/customer-notifications-bundle
+`$php bin/console commongateway:install common-gateway/customer-notifications-bundle`
 
 The dockerized method in the terminal and root folder:
 
