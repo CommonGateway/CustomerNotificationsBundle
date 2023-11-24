@@ -1,0 +1,11 @@
+name: My Product Page Workflow
+
+on:
+  push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create or Update publiccode.yaml
+        uses: OpenCatalogi/publiccode-action@0.0.1-main.53.17ba9e3       
