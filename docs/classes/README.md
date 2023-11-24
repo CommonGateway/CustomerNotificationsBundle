@@ -1,4 +1,4 @@
-# CommonGateway\PetStoreBundle
+# CommonGateway\CustomerNotificationsBundle
 
 * [Service\InstallationService](Service/InstallationService.md) 
-* [Service\PetStoreService](Service/PetStoreService.md) 
+* [Service\CustomerNotificationsService](Service/CustomerNotificationsService.md) 

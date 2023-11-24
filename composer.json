@@ -1,6 +1,6 @@
 {
-    "name": "common-gateway/pet-store-bundle",
-    "description": "An example package for creating symfony flex bundles as plugins",
+    "name": "common-gateway/customer-notifications-bundle",
+    "description": "A bundle containing logic for handling notifications & sending email/sms messages.",
     "type": "symfony-bundle",
     "keywords": [
         "commongateway",
@@ -9,14 +9,15 @@
         "conduction",
         "symfony",
         "common-gateway-plugin",
-        "pet store"
+        "customer notifications"
     ],
     "homepage": "https://commongateway.nl",
     "license": "EUPL-1.2",
     "minimum-stability": "dev",
     "require": {
         "php": ">=7.4",
-        "commongateway/corebundle": "^1.1.35"
+        "commongateway/corebundle": "^1.2.29",
+        "common-gateway/customer-interaction-bundle": "^0.0.52"
     },
     "require-dev": {
         "symfony/dependency-injection": "~3.4|~4.1|~5.0"
@@ -34,7 +35,7 @@
     },
     "autoload": {
         "psr-4": {
-            "CommonGateway\\PetStoreBundle\\": "src/"
+            "CommonGateway\\CustomerNotificationsBundle\\": "src/"
         }
     }
 }

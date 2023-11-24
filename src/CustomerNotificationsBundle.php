@@ -1,16 +1,16 @@
 <?php
 /**
- * The pet store bundle aims at providing an example common gateway plugin
+ * The customer notifications bundle aims at providing logic for handling notifications & sending email/sms messages.
  *
  * @author  Conduction.nl <info@conduction.nl>
  * @license EUPL-1.2 https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
  */
 
-namespace CommonGateway\PetStoreBundle;
+namespace CommonGateway\CustomerNotificationsBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class PetStoreBundle extends Bundle
+class CustomerNotificationsBundle extends Bundle
 {
 
 

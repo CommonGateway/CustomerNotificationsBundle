@@ -1,4 +1,4 @@
-# CommonGateway\PetStoreBundle\Service\PetStoreService  
+# CommonGateway\CustomerNotificationsBundle\Service\CustomerNotificationsService  
 
 An example service for adding business logic to your class.
 
@@ -10,13 +10,13 @@ An example service for adding business logic to your class.
 
 | Name | Description |
 |------|-------------|
-|[__construct](#petstoreservice__construct)||
-|[petStoreHandler](#petstoreservicepetstorehandler)|An example handler that is triggered by an action.|
+|[__construct](#customernotificationsservice__construct)||
+|[customerNotificationsHandler](#customernotificationsservicecustomernotificationshandler)|An example handler that is triggered by an action.|
 
 
 
 
-### PetStoreService::__construct  
+### CustomerNotificationsService::__construct  
 
 **Description**
 
@@ -40,12 +40,12 @@ An example service for adding business logic to your class.
 <hr />
 
 
-### PetStoreService::petStoreHandler  
+### CustomerNotificationsService::customerNotificationsHandler  
 
 **Description**
 
 ```php
-public petStoreHandler (array $data, array $configuration)
+public customerNotificationsHandler (array $data, array $configuration)
 ```
 
 An example handler that is triggered by an action. 

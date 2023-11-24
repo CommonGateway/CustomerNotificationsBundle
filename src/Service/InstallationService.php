@@ -1,6 +1,6 @@
 <?php
 
-namespace CommonGateway\PetStoreBundle\Service;
+namespace CommonGateway\CustomerNotificationsBundle\Service;
 
 use CommonGateway\CoreBundle\Installer\InstallerInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -56,7 +56,7 @@ class InstallationService implements InstallerInterface
      */
     public function install()
     {
-        $this->logger->debug("PetStoreBundle -> Install()");
+        $this->logger->debug("CustomerNotificationsBundle -> Install()");
 
         $this->checkDataConsistency();
 
@@ -70,7 +70,7 @@ class InstallationService implements InstallerInterface
      */
     public function update()
     {
-        $this->logger->debug("PetStoreBundle -> Update()");
+        $this->logger->debug("CustomerNotificationsBundle -> Update()");
 
         $this->checkDataConsistency();
 
@@ -84,7 +84,7 @@ class InstallationService implements InstallerInterface
      */
     public function uninstall()
     {
-        $this->logger->debug("PetStoreBundle -> Uninstall()");
+        $this->logger->debug("CustomerNotificationsBundle -> Uninstall()");
 
         // Do some cleanup to uninstall correctly...
 

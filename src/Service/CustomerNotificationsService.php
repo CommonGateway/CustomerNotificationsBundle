@@ -1,12 +1,12 @@
 <?php
 
-namespace CommonGateway\PetStoreBundle\Service;
+namespace CommonGateway\CustomerNotificationsBundle\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * An example service for adding business logic to your class.
+ * @todo
  *
  * @author Conduction.nl <info@conduction.nl>
  *
@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
  *
  * @category Service
  */
-class PetStoreService
+class CustomerNotificationsService
 {
 
     /**
@@ -57,23 +57,23 @@ class PetStoreService
 
 
     /**
-     * An example handler that is triggered by an action.
+     * @todo
      *
      * @param array $data          The data array
      * @param array $configuration The configuration array
      *
      * @return array A handler must ALWAYS return an array
      */
-    public function petStoreHandler(array $data, array $configuration): array
+    public function customerNotificationsHandler(array $data, array $configuration): array
     {
         $this->data          = $data;
         $this->configuration = $configuration;
 
-        $this->logger->debug("PetStoreService -> petStoreHandler()");
+        $this->logger->debug("CustomerNotificationsService -> customerNotificationsHandler()");
 
-        return ['response' => 'Hello. Your PetStoreBundle works'];
+        return ['response' => 'Hello. Your CustomerNotificationsBundle works'];
 
-    }//end petStoreHandler()
+    }//end customerNotificationsHandler()
 
 
 }//end class
