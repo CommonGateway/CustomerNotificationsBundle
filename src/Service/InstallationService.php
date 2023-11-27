@@ -9,7 +9,7 @@ use Psr\Log\LoggerInterface;
 /**
  * The installation service for this plugin.
  *
- * @author  Conduction.nl <info@conduction.nl>
+ * @author  Conduction.nl <info@conduction.nl>, Wilco Louwerse <wilco@conduction.nl>
  *
  * @license EUPL-1.2 https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
  *

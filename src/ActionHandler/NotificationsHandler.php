@@ -6,7 +6,7 @@ use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 use CommonGateway\CustomerNotificationsBundle\Service\NotificationsService;
 
 /**
- * @todo
+ * The Handler for handling notifications.
  *
  * @author Conduction.nl <info@conduction.nl>, Wilco Louwerse <wilco@conduction.nl>
  *

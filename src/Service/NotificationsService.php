@@ -6,9 +6,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * @todo
+ * This service handles the incoming notifications. Creating email and/or sms messages if configured to do so.
  *
- * @author Conduction.nl <info@conduction.nl>
+ * @author Conduction.nl <info@conduction.nl>, Wilco Louwerse <wilco@conduction.nl>
  *
  * @license EUPL-1.2 https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
  *
