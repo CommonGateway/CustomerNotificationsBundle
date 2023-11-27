@@ -11,7 +11,7 @@ This service handles the incoming notifications. Creating email and/or sms messa
 | Name | Description |
 |------|-------------|
 |[__construct](#notificationsservice__construct)||
-|[notificationsHandler](#notificationsservicenotificationshandler)||
+|[notificationsHandler](#notificationsservicenotificationshandler)|Handles incoming notification api-call and is responsible for generating a response.|
 
 
 
@@ -45,20 +45,25 @@ This service handles the incoming notifications. Creating email and/or sms messa
 **Description**
 
 ```php
- notificationsHandler (void)
+public notificationsHandler (array $data, array $configuration)
 ```
 
- 
+Handles incoming notification api-call and is responsible for generating a response. 
 
- 
+Might also send an email and/or sms after, etc. 
 
 **Parameters**
 
-`This function has no parameters.`
+* `(array) $data`
+: The data array  
+* `(array) $configuration`
+: The configuration array  
 
 **Return Values**
 
-`void`
+`array`
+
+> A handler must ALWAYS return an array
 
 
 <hr />
