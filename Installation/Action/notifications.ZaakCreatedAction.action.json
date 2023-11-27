@@ -10,6 +10,14 @@
             {
                 "==": [
                     {
+                        "var": "method"
+                    },
+                    "POST"
+                ]
+            },
+            {
+                "==": [
+                    {
                         "var": "kanaal"
                     },
                     "zaken"
@@ -27,6 +35,14 @@
     },
     "class": "CommonGateway\\CustomerNotificationsBundle\\ActionHandler\\NotificationsHandler",
     "configuration": {
-
+        "emailConfig": {
+            "useObjectEntityData": "Entity ref or uuid",
+            "throw": "throwForEmailAction"
+        },
+        "smsConfig": {
+            "useObjectEntityData": "Entity ref or uuid",
+            "throw": "throwForSMSAction"
+        },
+        "contactMomentEntity": "Entity ref or uuid"
     }
 }
