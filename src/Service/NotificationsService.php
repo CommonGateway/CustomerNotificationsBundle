@@ -57,7 +57,8 @@ class NotificationsService
 
 
     /**
-     * @todo
+     * Handles incoming notification api-call and is responsible for generating a response.
+     * Might also send an email and/or sms after, etc.
      *
      * @param array $data          The data array
      * @param array $configuration The configuration array
@@ -66,10 +67,14 @@ class NotificationsService
      */
     public function notificationsHandler(array $data, array $configuration): array
     {
+        if ($data['method'] !== 'POST') {
+            return $data;
+        }
+        
         $this->data          = $data;
         $this->configuration = $configuration;
 
-        $this->logger->debug("NotificationsService -> notificationsHandler()");
+        $this->logger->debug("NotificationsBundler -> NotificationsService -> notificationsHandler()");
 
         return ['response' => 'Hello. Your CustomerNotificationsBundle works'];
 

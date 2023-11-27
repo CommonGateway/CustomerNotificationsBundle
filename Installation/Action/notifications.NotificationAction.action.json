@@ -1,12 +1,29 @@
 {
-    "title": "NotificationAction",
-    "$id": "https://commongateway.nl/action/notifications.NotificationAction.action.json",
+    "title": "ZaakCreatedAction",
+    "$id": "https://commongateway.nl/action/notifications.ZaakCreatedAction.action.json",
     "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
     "version": "0.0.1",
     "listens": ["notifications.notification.created"],
     "conditions":
     {
-        "==": [1, 1]
+        "and": [
+            {
+                "==": [
+                    {
+                        "var": "kanaal"
+                    },
+                    "zaken"
+                ]
+            },
+            {
+                "==": [
+                    {
+                        "var": "actie"
+                    },
+                    "create"
+                ]
+            }
+        ]
     },
     "class": "CommonGateway\\CustomerNotificationsBundle\\ActionHandler\\NotificationsHandler",
     "configuration": {
