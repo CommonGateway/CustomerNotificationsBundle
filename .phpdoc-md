@@ -5,6 +5,6 @@ return (object)[
     'format' => 'github',
     'classes' => [
         '\CommonGateway\CustomerNotificationsBundle\Service\InstallationService',
-        '\CommonGateway\CustomerNotificationsBundle\Service\CustomerNotificationsService'
+        '\CommonGateway\CustomerNotificationsBundle\Service\NotificationsService'
     ],
 ];

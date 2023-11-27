@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
  *
  * @category Service
  */
-class CustomerNotificationsService
+class NotificationsService
 {
 
     /**
@@ -64,16 +64,16 @@ class CustomerNotificationsService
      *
      * @return array A handler must ALWAYS return an array
      */
-    public function customerNotificationsHandler(array $data, array $configuration): array
+    public function notificationsHandler(array $data, array $configuration): array
     {
         $this->data          = $data;
         $this->configuration = $configuration;
 
-        $this->logger->debug("CustomerNotificationsService -> customerNotificationsHandler()");
+        $this->logger->debug("NotificationsService -> notificationsHandler()");
 
         return ['response' => 'Hello. Your CustomerNotificationsBundle works'];
 
-    }//end customerNotificationsHandler()
+    }//end notificationsHandler()
 
 
 }//end class

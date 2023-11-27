@@ -1,6 +1,6 @@
 <?php
 /**
- * The customer notifications bundle aims at providing logic for handling notifications & sending email/sms messages.
+ * The notifications bundle aims at providing logic for handling notifications & sending email/sms messages.
  *
  * @author  Conduction.nl <info@conduction.nl>
  * @license EUPL-1.2 https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12

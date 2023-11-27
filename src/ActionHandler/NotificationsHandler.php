@@ -3,34 +3,34 @@
 namespace CommonGateway\CustomerNotificationsBundle\ActionHandler;
 
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
-use CommonGateway\CustomerNotificationsBundle\Service\CustomerNotificationsService;
+use CommonGateway\CustomerNotificationsBundle\Service\NotificationsService;
 
 /**
  * @todo
  *
- * @author Conduction.nl <info@conduction.nl>
+ * @author Conduction.nl <info@conduction.nl>, Wilco Louwerse <wilco@conduction.nl>
  *
  * @license EUPL-1.2 https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
  */
-class CustomerNotificationsHandler implements ActionHandlerInterface
+class NotificationsHandler implements ActionHandlerInterface
 {
 
     /**
-     * The customer notifications service used by the handler
+     * The notifications service used by the handler
      *
-     * @var CustomerNotificationsService
+     * @var NotificationsService
      */
-    private CustomerNotificationsService $customerNotificationsService;
+    private NotificationsService $notificationsService;
 
 
     /**
      * The constructor
      *
-     * @param CustomerNotificationsService $customerNotificationsService The customer notifications service
+     * @param NotificationsService $notificationsService The notifications service
      */
-    public function __construct(CustomerNotificationsService $customerNotificationsService)
+    public function __construct(NotificationsService $notificationsService)
     {
-        $this->customerNotificationsService = $customerNotificationsService;
+        $this->notificationsService = $notificationsService;
 
     }//end __construct()
 
@@ -43,9 +43,9 @@ class CustomerNotificationsHandler implements ActionHandlerInterface
     public function getConfiguration(): array
     {
         return [
-            '$id'         => 'https://commongateway.nl/ActionHandler/CustomerNotificationsHandler.ActionHandler.json',
+            '$id'         => 'https://commongateway.nl/ActionHandler/notificationsHandler.ActionHandler.json',
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
-            'title'       => 'CustomerNotifications ActionHandler',
+            'title'       => 'Notifications ActionHandler',
             'description' => 'This handler returns a welcoming string',
             'required'    => [],
             'properties'  => [],
@@ -66,7 +66,7 @@ class CustomerNotificationsHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->customerNotificationsService->customerNotificationsHandler($data, $configuration);
+        return $this->notificationsService->notificationsHandler($data, $configuration);
 
     }//end run()
 

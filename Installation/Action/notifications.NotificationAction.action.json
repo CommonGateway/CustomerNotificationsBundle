@@ -1,0 +1,15 @@
+{
+    "title": "NotificationAction",
+    "$id": "https://commongateway.nl/action/notifications.NotificationAction.action.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
+    "version": "0.0.1",
+    "listens": ["notifications.notification.created"],
+    "conditions":
+    {
+        "==": [1, 1]
+    },
+    "class": "CommonGateway\\CustomerNotificationsBundle\\ActionHandler\\notificationsHandler",
+    "configuration": {
+
+    }
+}

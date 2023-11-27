@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 /**
  * This class adds dependency injection.
  */
-class CustomerNotificationsExtension extends Extension
+class NotificationsExtension extends Extension
 {
 
 

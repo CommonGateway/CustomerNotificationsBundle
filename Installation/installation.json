@@ -1,3 +1,20 @@
 {
-    "installationService": "CommonGateway\\CustomerNotificationsBundle\\Service\\InstallationService"
+    "installationService": "CommonGateway\\CustomerNotificationsBundle\\Service\\InstallationService",
+    "endpoints": {
+        "schemas": [
+            {
+                "reference": "https://commongateway.nl/notifications.notification.schema.json",
+                "description": "An endpoint for Notifications",
+                "path": "notificaties",
+                "version": "0.0.1",
+                "methods": [
+                    "POST",
+                    "GET"
+                ],
+                "throws": [
+                    "notifications.notification.created"
+                ]
+            }
+        ]
+    }
 }
