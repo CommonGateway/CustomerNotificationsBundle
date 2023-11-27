@@ -1,6 +1,6 @@
 # CommonGateway\CustomerNotificationsBundle\Service\NotificationsService  
 
-
+This service handles the incoming notifications. Creating email and/or sms messages if configured to do so.
 
 
 
