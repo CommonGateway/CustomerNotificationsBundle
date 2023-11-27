@@ -70,7 +70,7 @@ class NotificationsService
         if ($data['method'] !== 'POST') {
             return $data;
         }
-        
+
         $this->data          = $data;
         $this->configuration = $configuration;
 
