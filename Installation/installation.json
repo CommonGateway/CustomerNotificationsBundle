@@ -3,7 +3,7 @@
     "endpoints": {
         "schemas": [
             {
-                "reference": "https://commongateway.nl/notifications.notification.schema.json",
+                "reference": "https://commongateway.nl/schema/notifications.notification.schema.json",
                 "description": "An endpoint for Notifications",
                 "path": "notifications",
                 "version": "0.0.1",
