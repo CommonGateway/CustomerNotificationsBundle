@@ -8,7 +8,7 @@
     {
         "==": [1, 1]
     },
-    "class": "CommonGateway\\CustomerNotificationsBundle\\ActionHandler\\notificationsHandler",
+    "class": "CommonGateway\\CustomerNotificationsBundle\\ActionHandler\\NotificationsHandler",
     "configuration": {
 
     }
