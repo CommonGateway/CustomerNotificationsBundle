@@ -3,9 +3,12 @@
 namespace CommonGateway\CustomerNotificationsBundle\Service;
 
 use App\Entity\ObjectEntity;
+use App\Event\ActionEvent;
+use CommonGateway\CoreBundle\Service\CacheService;
 use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -62,24 +65,44 @@ class NotificationsService
      * @var GatewayResourceService
      */
     private GatewayResourceService $resourceService;
+    
+    /**
+     * The Cache Service.
+     *
+     * @var CacheService
+     */
+    private CacheService $cacheService;
+    
+    /**
+     * The event dispatcher.
+     *
+     * @var EventDispatcherInterface
+     */
+    private EventDispatcherInterface $eventDispatcher;
 
 
     /**
-     * @param EntityManagerInterface $entityManager   The Entity Manager.
-     * @param LoggerInterface        $pluginLogger    The plugin version of the logger interface.
-     * @param CallService            $callService     The Call Service
-     * @param GatewayResourceService $resourceService The Gateway Resource Service.
+     * @param EntityManagerInterface    $entityManager   The Entity Manager.
+     * @param LoggerInterface           $pluginLogger    The plugin version of the logger interface.
+     * @param CallService               $callService     The Call Service
+     * @param GatewayResourceService    $resourceService The Gateway Resource Service.
+     * @param CacheService              $cacheService    The Cache Service.
+     * @param EventDispatcherInterface  $eventDispatcher The event dispatcher.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         LoggerInterface $pluginLogger,
         CallService $callService,
-        GatewayResourceService $resourceService
+        GatewayResourceService $resourceService,
+        CacheService $cacheService,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->entityManager   = $entityManager;
         $this->logger          = $pluginLogger;
         $this->callService     = $callService;
         $this->resourceService = $resourceService;
+        $this->cacheService    = $cacheService;
+        $this->eventDispatcher = $eventDispatcher;
         $this->configuration   = [];
         $this->data            = [];
 
@@ -200,35 +223,50 @@ class NotificationsService
         return true;
 
     }//end handleUrlCondition()
-
-
-    private function handleEmail()
+    
+    /**
+     * If emailConfig has been configured in the Action->configuration.
+     * This function handles getting info for an email and throwing the email event that will trigger the actual email sending.
+     *
+     * @return void
+     */
+    private function handleEmail(): ?array
     {
         // If there are is no emailConfig, return.
         if (empty($this->configuration['emailConfig']) === true) {
-            return;
+            return null;
         }
 
         $emailConfig = $this->configuration['emailConfig'];
 
         if (empty($emailConfig['throw']) === true) {
             $this->logger->error("Action configuration emailConfig is missing the key = 'throw'.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
-            return;
+            return null;
         }
 
+        // Todo: duplicate code with sms?
         if (empty($emailConfig['useObjectEntityData']) === false) {
             // todo...
             // Object id?
             $id     = '';
-            $object = $this->getObject($emailConfig['useObjectEntityData'], $id);
+            $object = $this->cacheService->getObject($id, $emailConfig['useObjectEntityData']);
         }
 
         // Throw email event
-        return;
+        $event = new ActionEvent('commongateway.action.event', $object ?? [], $emailConfig['throw']);
+        
+        $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
+        
+        return $event->getData();
 
     }//end handleEmail()
-
-
+    
+    /**
+     * If smsConfig has been configured in the Action->configuration.
+     * This function handles getting info for a sms and throwing the sms event that will trigger the actual sms sending.
+     *
+     * @return void
+     */
     private function handleSMS()
     {
         // If there are is no smsConfig, return.
@@ -242,41 +280,45 @@ class NotificationsService
             $this->logger->error("Action configuration smsConfig is missing the key = 'throw'.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
             return;
         }
-
+        
+        // Todo: duplicate code with email?
         if (empty($smsConfig['useObjectEntityData']) === false) {
             // todo...
             // Object id?
             $id     = '';
-            $object = $this->getObject($smsConfig['useObjectEntityData'], $id);
+            $object = $this->cacheService->getObject($id, $smsConfig['useObjectEntityData']);
         }
-
-        // todo: Throw SMS event
-        return;
+        
+        // Throw sms event
+        $event = new ActionEvent('commongateway.action.event', $object ?? [], $smsConfig['throw']);
+        
+        $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
+        
+        return $event->getData();
 
     }//end handleSMS()
-
-
-    private function getObject(string $entityRef, string $id): ?ObjectEntity
-    {
-        $object = null;
-
-        // todo...
-        // Find Entity
-        // Find ObjectEntity
-        return $object;
-
-    }//end getObject()
-
-
+    
+    /**
+     * If createObjectConfig has been configured in the Action->configuration.
+     * This function will create an ObjectEntity using data from notification or other configured objects.
+     *
+     * @return void
+     */
     private function createObject()
     {
-        // If there are is no createObjectEntity, return.
-        if (empty($this->configuration['createObjectEntity']) === true) {
+        // If there are is no createObjectConfig, return.
+        if (empty($this->configuration['createObjectConfig']) === true) {
             return;
         }
-
+        
+        $createObjectConfig = $this->configuration['createObjectConfig'];
+        
+        $schema = $this->resourceService->getSchema($createObjectConfig['schema'], 'open-catalogi/open-catalogi-bundle');
+        if ($schema === null) {
+            return;
+        }
+        
         // todo...
-        // Find Entity
         // Input for object creation?
         // Find (& do) Mapping
         // Create ObjectEntity

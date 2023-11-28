@@ -67,7 +67,7 @@ class NotificationsHandler implements ActionHandlerInterface
                     'example'     => '{"useObjectEntityData":"https://example.nl/schema/example.partij.schema.json","throw":"notifications.zaak.created.sms"}',
                     'nullable'    => true,
                 ],
-                'createObjectEntity' => [
+                'createObjectConfig' => [
                     'type'        => 'array',
                     'description' => 'Configuration for creating an ObjectEntity at the end of handling a Notification.',
                     'example'     => '{"entity":"https://example.nl/schema/example.contactMoment.schema.json","mapping":"https://example.nl/mapping/notifications.contactMoment.mapping.json"}',

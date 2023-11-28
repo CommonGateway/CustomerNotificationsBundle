@@ -51,8 +51,8 @@
             "useObjectEntityData": "Entity ref or uuid",
             "throw": "throwForSMSAction"
         },
-        "createObjectEntity": {
-            "entity": "Entity ref or uuid",
+        "createObjectConfig": {
+            "schema": "Entity ref or uuid",
             "mapping": "Mapping ref or uuid"
         }
     }
