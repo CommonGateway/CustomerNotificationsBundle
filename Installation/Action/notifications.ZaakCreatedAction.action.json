@@ -18,7 +18,7 @@
             {
                 "==": [
                     {
-                        "var": "kanaal"
+                        "var": "body.kanaal"
                     },
                     "zaken"
                 ]
@@ -26,7 +26,7 @@
             {
                 "==": [
                     {
-                        "var": "actie"
+                        "var": "body.actie"
                     },
                     "create"
                 ]
