@@ -65,14 +65,14 @@ class NotificationsService
      * @var GatewayResourceService
      */
     private GatewayResourceService $resourceService;
-    
+
     /**
      * The Cache Service.
      *
      * @var CacheService
      */
     private CacheService $cacheService;
-    
+
     /**
      * The event dispatcher.
      *
@@ -82,12 +82,12 @@ class NotificationsService
 
 
     /**
-     * @param EntityManagerInterface    $entityManager   The Entity Manager.
-     * @param LoggerInterface           $pluginLogger    The plugin version of the logger interface.
-     * @param CallService               $callService     The Call Service
-     * @param GatewayResourceService    $resourceService The Gateway Resource Service.
-     * @param CacheService              $cacheService    The Cache Service.
-     * @param EventDispatcherInterface  $eventDispatcher The event dispatcher.
+     * @param EntityManagerInterface   $entityManager   The Entity Manager.
+     * @param LoggerInterface          $pluginLogger    The plugin version of the logger interface.
+     * @param CallService              $callService     The Call Service
+     * @param GatewayResourceService   $resourceService The Gateway Resource Service.
+     * @param CacheService             $cacheService    The Cache Service.
+     * @param EventDispatcherInterface $eventDispatcher The event dispatcher.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -223,7 +223,8 @@ class NotificationsService
         return true;
 
     }//end handleUrlCondition()
-    
+
+
     /**
      * If emailConfig has been configured in the Action->configuration.
      * This function handles getting info for an email and throwing the email event that will trigger the actual email sending.
@@ -253,14 +254,15 @@ class NotificationsService
         }
 
         // Throw email event
-        $event = new ActionEvent('commongateway.action.event', $object ?? [], $emailConfig['throw']);
-        
+        $event = new ActionEvent('commongateway.action.event', ($object ?? []), $emailConfig['throw']);
+
         $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
-        
+
         return $event->getData();
 
     }//end handleEmail()
-    
+
+
     /**
      * If smsConfig has been configured in the Action->configuration.
      * This function handles getting info for a sms and throwing the sms event that will trigger the actual sms sending.
@@ -280,7 +282,7 @@ class NotificationsService
             $this->logger->error("Action configuration smsConfig is missing the key = 'throw'.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
             return;
         }
-        
+
         // Todo: duplicate code with email?
         if (empty($smsConfig['useObjectEntityData']) === false) {
             // todo...
@@ -288,16 +290,17 @@ class NotificationsService
             $id     = '';
             $object = $this->cacheService->getObject($id, $smsConfig['useObjectEntityData']);
         }
-        
+
         // Throw sms event
-        $event = new ActionEvent('commongateway.action.event', $object ?? [], $smsConfig['throw']);
-        
+        $event = new ActionEvent('commongateway.action.event', ($object ?? []), $smsConfig['throw']);
+
         $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
-        
+
         return $event->getData();
 
     }//end handleSMS()
-    
+
+
     /**
      * If createObjectConfig has been configured in the Action->configuration.
      * This function will create an ObjectEntity using data from notification or other configured objects.
@@ -310,14 +313,14 @@ class NotificationsService
         if (empty($this->configuration['createObjectConfig']) === true) {
             return;
         }
-        
+
         $createObjectConfig = $this->configuration['createObjectConfig'];
-        
+
         $schema = $this->resourceService->getSchema($createObjectConfig['schema'], 'open-catalogi/open-catalogi-bundle');
         if ($schema === null) {
             return;
         }
-        
+
         // todo...
         // Input for object creation?
         // Find (& do) Mapping
