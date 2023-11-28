@@ -1,6 +1,6 @@
 {
-    "title": "ZaakCreatedAction",
-    "$id": "https://commongateway.nl/action/notifications.ZaakCreatedAction.action.json",
+    "title": "ZaakFinishedAction",
+    "$id": "https://commongateway.nl/action/notifications.ZaakFinishedAction.action.json",
     "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
     "version": "0.0.1",
     "listens": ["notifications.notification.created"],
@@ -28,7 +28,7 @@
                     {
                         "var": "body.resource"
                     },
-                    "zaak"
+                    "status"
                 ]
             },
             {
@@ -36,13 +36,19 @@
                     {
                         "var": "body.actie"
                     },
-                    "create"
+                    "update"
                 ]
             }
         ]
     },
     "class": "CommonGateway\\CustomerNotificationsBundle\\ActionHandler\\NotificationsHandler",
     "configuration": {
+        "extraConditions": {
+            "body.resourceUrl": {
+                "commongatewaySourceRef": "source.ref",
+                "statustype": "https://afgerondStatusTypeUrl"
+            }
+        },
         "emailConfig": {
             "useObjectEntityData": "Entity ref or uuid",
             "throw": "throwForEmailAction"

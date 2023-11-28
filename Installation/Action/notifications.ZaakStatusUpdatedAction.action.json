@@ -1,6 +1,6 @@
 {
-    "title": "ZaakCreatedAction",
-    "$id": "https://commongateway.nl/action/notifications.ZaakCreatedAction.action.json",
+    "title": "ZaakStatusUpdatedAction",
+    "$id": "https://commongateway.nl/action/notifications.ZaakStatusUpdatedAction.action.json",
     "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
     "version": "0.0.1",
     "listens": ["notifications.notification.created"],
@@ -28,7 +28,7 @@
                     {
                         "var": "body.resource"
                     },
-                    "zaak"
+                    "status"
                 ]
             },
             {
@@ -36,7 +36,7 @@
                     {
                         "var": "body.actie"
                     },
-                    "create"
+                    "update"
                 ]
             }
         ]
