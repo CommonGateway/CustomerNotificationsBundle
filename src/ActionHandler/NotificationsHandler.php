@@ -46,9 +46,34 @@ class NotificationsHandler implements ActionHandlerInterface
             '$id'         => 'https://commongateway.nl/ActionHandler/NotificationsHandler.ActionHandler.json',
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'Notifications ActionHandler',
-            'description' => 'This handler returns a welcoming string',
+            'description' => 'This handler handles incoming notifications. Creating email and/or sms messages if configured to do so.',
             'required'    => [],
-            'properties'  => [],
+            'properties'  => [
+                'extraConditions' => [
+                    'type'        => 'array',
+                    'description' => 'Extra conditions for this action, makes it possible to check properties from an object in a Source outside the Gateway and use this as conditions. (In the example we check property "statustype" of the "body.resourceUrl" object from the notification. Using the source with reference "commongatewaySourceRef")',
+                    'example'     => '{"body.resourceUrl":{"commongatewaySourceRef":"https://example.nl/source/example.brp.source.json","statustype":"https://finishedStatusTypeUrl"}}',
+                    'nullable'    => true,
+                ],
+                'emailConfig' => [
+                    'type'        => 'array',
+                    'description' => 'Configuration for sending an email after the notification has been received. If not present no email will be send. "useObjectEntityData" can be used to configure what entity should be used for getting and adding ObjectEntity data to the email. "throw" is the event we should throw to trigger another EmailHandler action that will send the actual email.',
+                    'example'     => '{"useObjectEntityData":"https://example.nl/schema/example.partij.schema.json","throw":"notifications.zaak.created.email"}',
+                    'nullable'    => true,
+                ],
+                'smsConfig' => [
+                    'type'        => 'array',
+                    'description' => 'Configuration for sending an sms after the notification has been received. If not present no sms will be send. "useObjectEntityData" can be used to configure what entity should be used for getting and adding ObjectEntity data to the sms message. "throw" is the event we should throw to trigger another SMSHandler action that will send the actual sms.',
+                    'example'     => '{"useObjectEntityData":"https://example.nl/schema/example.partij.schema.json","throw":"notifications.zaak.created.sms"}',
+                    'nullable'    => true,
+                ],
+                'createObjectEntity' => [
+                    'type'        => 'array',
+                    'description' => 'Configuration for creating an ObjectEntity at the end of handling a Notification.',
+                    'example'     => '{"entity":"https://example.nl/schema/example.contactMoment.schema.json","mapping":"https://example.nl/mapping/notifications.contactMoment.mapping.json"}',
+                    'nullable'    => true,
+                ]
+            ],
         ];
 
     }//end getConfiguration()

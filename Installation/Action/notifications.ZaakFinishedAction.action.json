@@ -57,6 +57,9 @@
             "useObjectEntityData": "Entity ref or uuid",
             "throw": "throwForSMSAction"
         },
-        "contactMomentEntity": "Entity ref or uuid"
+        "createObjectEntity": {
+            "entity": "Entity ref or uuid",
+            "mapping": "Mapping ref or uuid"
+        }
     }
 }

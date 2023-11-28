@@ -2,10 +2,12 @@
 
 namespace CommonGateway\CustomerNotificationsBundle\Service;
 
+use App\Entity\ObjectEntity;
 use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * This service handles the incoming notifications. Creating email and/or sms messages if configured to do so.
@@ -105,10 +107,18 @@ class NotificationsService
         if ($this->handleExtraConditions() === false) {
             return $data;
         }
-
+        
         $this->logger->debug("NotificationsBundler -> NotificationsService -> notificationsHandler()", ['plugin' => 'common-gateway/customer-notifications-bundle']);
-
-        return ['response' => 'Hello. Your CustomerNotificationsBundle works'];
+        
+        $this->handleEmail();
+        $this->handleSMS();
+        $this->createObject();
+        
+        // todo: improve response, depending on what this notification triggered? ',email send, ContactMoment Object created', etc.
+        $response = ['Message' => 'Notification received.'];
+        $data['response'] = new Response(json_encode($response), 200, ['Content-type' => 'application/json']);
+        
+        return $data;
 
     }//end notificationsHandler()
 
@@ -121,7 +131,7 @@ class NotificationsService
     private function handleExtraConditions(): bool
     {
         // If there are no extra conditions return true.
-        if (isset($this->configuration['extraConditions']) === false) {
+        if (empty($this->configuration['extraConditions']) === true) {
             return true;
         }
 
@@ -158,7 +168,7 @@ class NotificationsService
     private function handleUrlCondition(string $dataKey, array $condition): bool
     {
         // Todo: Maybe we could/should support multiple Sources instead of one?
-        if (isset($condition['commongatewaySourceRef']) === false) {
+        if (empty($condition['commongatewaySourceRef']) === true) {
             $this->logger->error("ExtraCondition $dataKey is missing the key = 'commongatewaySourceRef' (with = a Source reference)", ['plugin' => 'common-gateway/customer-notifications-bundle']);
             return false;
         }
@@ -192,11 +202,86 @@ class NotificationsService
     }//end handleUrlCondition()
 
 
-    private function sendEmail()
+    private function handleEmail()
     {
-        // todo...
+        // If there are is no emailConfig, return.
+        if (empty($this->configuration['emailConfig']) === true) {
+            return;
+        }
+        $emailConfig = $this->configuration['emailConfig'];
+        
+        if (empty($emailConfig['throw']) === true) {
+            $this->logger->error("Action configuration emailConfig is missing the key = 'throw'.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
+            return;
+        }
+        
+        if (empty($emailConfig['useObjectEntityData']) === false) {
+            //todo...
+            // Object id?
+            $id = '';
+            $object = $this->getObject($emailConfig['useObjectEntityData'], $id);
+        }
+        
+        // Throw email event
+        
+        return;
 
-    }//end sendEmail()
+    }//end handleEmail()
+    
+    
+    private function handleSMS()
+    {
+        // If there are is no smsConfig, return.
+        if (empty($this->configuration['smsConfig']) === true) {
+            return;
+        }
+        $smsConfig = $this->configuration['smsConfig'];
+        
+        if (empty($smsConfig['throw']) === true) {
+            $this->logger->error("Action configuration smsConfig is missing the key = 'throw'.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
+            return;
+        }
+        
+        if (empty($smsConfig['useObjectEntityData']) === false) {
+            //todo...
+            // Object id?
+            $id = '';
+            $object = $this->getObject($smsConfig['useObjectEntityData'], $id);
+        }
+        
+        //todo: Throw SMS event
+        
+        return;
+        
+    }//end handleSMS()
+    
+    private function getObject(string $entityRef, string $id): ?ObjectEntity
+    {
+        $object = null;
+        
+        //todo...
+        // Find Entity
+        // Find ObjectEntity
+        
+        return $object;
+    }
+    
+    private function createObject()
+    {
+        // If there are is no createObjectEntity, return.
+        if (empty($this->configuration['createObjectEntity']) === true) {
+            return;
+        }
+        
+        //todo...
+        // Find Entity
+        // Input for object creation?
+        // Find (& do) Mapping
+        // Create ObjectEntity
+        
+        return;
+        
+    }//end handleSMS()
 
 
 }//end class
