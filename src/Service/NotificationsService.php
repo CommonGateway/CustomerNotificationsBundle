@@ -107,17 +107,17 @@ class NotificationsService
         if ($this->handleExtraConditions() === false) {
             return $data;
         }
-        
+
         $this->logger->debug("NotificationsBundler -> NotificationsService -> notificationsHandler()", ['plugin' => 'common-gateway/customer-notifications-bundle']);
-        
+
         $this->handleEmail();
         $this->handleSMS();
         $this->createObject();
-        
+
         // todo: improve response, depending on what this notification triggered? ',email send, ContactMoment Object created', etc.
-        $response = ['Message' => 'Notification received.'];
+        $response         = ['Message' => 'Notification received.'];
         $data['response'] = new Response(json_encode($response), 200, ['Content-type' => 'application/json']);
-        
+
         return $data;
 
     }//end notificationsHandler()
@@ -208,80 +208,81 @@ class NotificationsService
         if (empty($this->configuration['emailConfig']) === true) {
             return;
         }
+
         $emailConfig = $this->configuration['emailConfig'];
-        
+
         if (empty($emailConfig['throw']) === true) {
             $this->logger->error("Action configuration emailConfig is missing the key = 'throw'.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
             return;
         }
-        
+
         if (empty($emailConfig['useObjectEntityData']) === false) {
-            //todo...
+            // todo...
             // Object id?
-            $id = '';
+            $id     = '';
             $object = $this->getObject($emailConfig['useObjectEntityData'], $id);
         }
-        
+
         // Throw email event
-        
         return;
 
     }//end handleEmail()
-    
-    
+
+
     private function handleSMS()
     {
         // If there are is no smsConfig, return.
         if (empty($this->configuration['smsConfig']) === true) {
             return;
         }
+
         $smsConfig = $this->configuration['smsConfig'];
-        
+
         if (empty($smsConfig['throw']) === true) {
             $this->logger->error("Action configuration smsConfig is missing the key = 'throw'.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
             return;
         }
-        
+
         if (empty($smsConfig['useObjectEntityData']) === false) {
-            //todo...
+            // todo...
             // Object id?
-            $id = '';
+            $id     = '';
             $object = $this->getObject($smsConfig['useObjectEntityData'], $id);
         }
-        
-        //todo: Throw SMS event
-        
+
+        // todo: Throw SMS event
         return;
-        
+
     }//end handleSMS()
-    
+
+
     private function getObject(string $entityRef, string $id): ?ObjectEntity
     {
         $object = null;
-        
-        //todo...
+
+        // todo...
         // Find Entity
         // Find ObjectEntity
-        
         return $object;
-    }
-    
+
+    }//end getObject()
+
+
     private function createObject()
     {
         // If there are is no createObjectEntity, return.
         if (empty($this->configuration['createObjectEntity']) === true) {
             return;
         }
-        
-        //todo...
+
+        // todo...
         // Find Entity
         // Input for object creation?
         // Find (& do) Mapping
         // Create ObjectEntity
-        
         return;
-        
-    }//end handleSMS()
+
+    }//end createObject()
 
 
 }//end class
