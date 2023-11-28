@@ -9,7 +9,8 @@
         "conduction",
         "symfony",
         "common-gateway-plugin",
-        "customer notifications"
+        "customer",
+        "notifications"
     ],
     "homepage": "https://commongateway.nl",
     "license": "EUPL-1.2",

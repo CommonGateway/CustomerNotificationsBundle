@@ -2,8 +2,10 @@
 /**
  * The notifications bundle aims at providing logic for handling notifications & sending email/sms messages.
  *
- * @author  Conduction.nl <info@conduction.nl>
+ * @author  Conduction.nl <info@conduction.nl>, Wilco Louwerse <wilco@conduction.nl>
  * @license EUPL-1.2 https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
+ *
+ * @category Bundle
  */
 
 namespace CommonGateway\CustomerNotificationsBundle;

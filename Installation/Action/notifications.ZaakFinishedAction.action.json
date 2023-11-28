@@ -1,0 +1,62 @@
+{
+    "title": "ZaakFinishedAction",
+    "$id": "https://commongateway.nl/action/notifications.ZaakFinishedAction.action.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
+    "version": "0.0.1",
+    "listens": ["notifications.notification.created"],
+    "conditions":
+    {
+        "and": [
+            {
+                "==": [
+                    {
+                        "var": "method"
+                    },
+                    "POST"
+                ]
+            },
+            {
+                "==": [
+                    {
+                        "var": "body.kanaal"
+                    },
+                    "zaken"
+                ]
+            },
+            {
+                "==": [
+                    {
+                        "var": "body.resource"
+                    },
+                    "status"
+                ]
+            },
+            {
+                "==": [
+                    {
+                        "var": "body.actie"
+                    },
+                    "update"
+                ]
+            }
+        ]
+    },
+    "class": "CommonGateway\\CustomerNotificationsBundle\\ActionHandler\\NotificationsHandler",
+    "configuration": {
+        "extraConditions": {
+            "body.resourceUrl": {
+                "commongatewaySourceRef": "source.ref",
+                "statustype": "https://afgerondStatusTypeUrl"
+            }
+        },
+        "emailConfig": {
+            "useObjectEntityData": "Entity ref or uuid",
+            "throw": "throwForEmailAction"
+        },
+        "smsConfig": {
+            "useObjectEntityData": "Entity ref or uuid",
+            "throw": "throwForSMSAction"
+        },
+        "contactMomentEntity": "Entity ref or uuid"
+    }
+}

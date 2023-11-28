@@ -1,0 +1,56 @@
+{
+    "title": "ZaakCreatedAction",
+    "$id": "https://commongateway.nl/action/notifications.ZaakCreatedAction.action.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
+    "version": "0.0.1",
+    "listens": ["notifications.notification.created"],
+    "conditions":
+    {
+        "and": [
+            {
+                "==": [
+                    {
+                        "var": "method"
+                    },
+                    "POST"
+                ]
+            },
+            {
+                "==": [
+                    {
+                        "var": "body.kanaal"
+                    },
+                    "zaken"
+                ]
+            },
+            {
+                "==": [
+                    {
+                        "var": "body.resource"
+                    },
+                    "zaak"
+                ]
+            },
+            {
+                "==": [
+                    {
+                        "var": "body.actie"
+                    },
+                    "create"
+                ]
+            }
+        ]
+    },
+    "class": "CommonGateway\\CustomerNotificationsBundle\\ActionHandler\\NotificationsHandler",
+    "configuration": {
+        "emailConfig": {
+            "useObjectEntityData": "Entity ref or uuid",
+            "throw": "throwForEmailAction"
+        },
+        "smsConfig": {
+            "useObjectEntityData": "Entity ref or uuid",
+            "throw": "throwForSMSAction"
+        },
+        "contactMomentEntity": "Entity ref or uuid"
+    }
+}

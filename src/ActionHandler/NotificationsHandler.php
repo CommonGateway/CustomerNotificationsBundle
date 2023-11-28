@@ -43,7 +43,7 @@ class NotificationsHandler implements ActionHandlerInterface
     public function getConfiguration(): array
     {
         return [
-            '$id'         => 'https://commongateway.nl/ActionHandler/notificationsHandler.ActionHandler.json',
+            '$id'         => 'https://commongateway.nl/ActionHandler/NotificationsHandler.ActionHandler.json',
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'Notifications ActionHandler',
             'description' => 'This handler returns a welcoming string',
@@ -62,7 +62,7 @@ class NotificationsHandler implements ActionHandlerInterface
      *
      * @return array
      *
-     * @SuppressWarnings("unused") Handlers ara strict implementations
+     * @SuppressWarnings("unused") Handlers are strict implementations
      */
     public function run(array $data, array $configuration): array
     {
