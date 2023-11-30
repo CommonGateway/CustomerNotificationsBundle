@@ -51,17 +51,16 @@
         },
         "emailConfig": {
             "getObjectDataConfig": {
-                "notificationProperty": "body.hoofdObject",
                 "source": "https://buren.nl/source/buren.zrc.source.json",
-                "sourceProperties": ["rollen"],
-                "getObjectDataConfig": {
-                    "source": "https://buren.nl/source/buren.zrc.source.json",
-                    "sourceProperties": ["bsn"],
-                    "forParentProperties": ["rollen"]
+                "sourceEndpoint": "rollen",
+                "sourceQuery": {
+                    "zaak": "{{body.hoofdObject}}",
+                    "omschrijvingGeneriek": "initiator"
                 },
+                "sourceProperties": ["betrokkeneIdentificatie.inpBsn"],
                 "searchSchemas": ["https://commongateway.nl/klant.partij.schema.json"],
                 "searchQuery": {
-                    "externeIdentificaties.partijIdentificator.objectId": "{{bsn}}",
+                    "externeIdentificaties.partijIdentificator.objectId": "{{betrokkeneIdentificatie.inpBsn}}",
                     "externeIdentificaties.partijIdentificator.objecttype": "ingeschrevenpersoon"
                 }
             },

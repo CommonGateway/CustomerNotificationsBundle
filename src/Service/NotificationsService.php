@@ -254,6 +254,8 @@ class NotificationsService
 
             // Set $object in $this->configuration to be re-used in SMSConfig, if configured to do so.
             $this->configuration['emailConfig']['getObjectDataConfig']['SMSSameAsEmail'] = $object;
+            
+            // Todo: do we want to continue sending an email if we didn't find an object?
         }
 
         // Throw email event
@@ -293,6 +295,8 @@ class NotificationsService
             if (empty($object) === true) {
                 $object = $this->getObject($smsConfig['getObjectDataConfig']);
             }
+            
+            // Todo: do we want to continue sending an sms if we didn't find an object?
         }
 
         // Throw sms event
@@ -311,13 +315,16 @@ class NotificationsService
      */
     private function getObject(array $config): ?array
     {
-        if ($this->validateConfigArray(['notificationProperty', 'searchSchemas', 'searchQuery'], 'getObjectDataConfig', $config,) === false) {
+        if ($this->validateConfigArray(['notificationProperty|or|sourceEndpoint', 'searchSchemas', 'searchQuery'], 'getObjectDataConfig', $config,) === false) {
             return null;
         }
         
         $filter = $config['searchQuery'];
 
-        $config['dataKey'] = $config['notificationProperty'];
+        if (empty($config['sourceEndpoint']) === true) {
+            $config['dataKey'] = $config['notificationProperty'];
+        }
+        
         $filter            = $this->addSourceDataToFilter($filter, $config);
         if ($filter === null) {
             return null;
@@ -375,8 +382,8 @@ class NotificationsService
             if (empty($config['getObjectDataConfig']) === false
                 && in_array($sourceProperty, $config['getObjectDataConfig']['forParentProperties']) === true
             ) {
-                $config['getObjectDataConfig']['url'] = $sourcePropertyValue;
-                $filter                               = $this->addSourceDataToFilter($filter, $config['getObjectDataConfig']);
+                $config['getObjectDataConfig']['sourceEndpoint'] = $sourcePropertyValue;
+                $filter                                    = $this->addSourceDataToFilter($filter, $config['getObjectDataConfig']);
             }
 
             // Make sure to update filter, replace {{property}} with the actual value.
@@ -409,14 +416,27 @@ class NotificationsService
             return null;
         }
 
-        if (empty($config['url']) === true) {
-            $config['url'] = $this->data[$config['dataKey']];
+        if (empty($config['sourceEndpoint']) === true) {
+            $config['sourceEndpoint'] = $this->data[$config['dataKey']];
         }
 
-        $endpoint = str_replace($source->getLocation(), '', $config['url']);
+        $endpoint = str_replace($source->getLocation(), '', $config['sourceEndpoint']);
+        
+        $callConfig = [];
+        if (empty($config['sourceQuery']) === false) {
+            foreach ($config['sourceQuery'] as $key => $query) {
+                // Todo: replace this if statement & trim() with some fancy regex.
+                if (str_starts_with($query, '{{') === true && str_ends_with($query, '}}')) {
+                    $query = trim($query, '{}');
+                    $config['sourceQuery'][$key] = $this->data[$query];
+                }
+            }
+            
+            $callConfig['query'] = $config['sourceQuery'];
+        }
 
         try {
-            $response        = $this->callService->call($source, $endpoint);
+            $response        = $this->callService->call($source, $endpoint, $callConfig);
             $decodedResponse = json_decode($response->getBody()->getContents(), true);
         } catch (Exception $e) {
             $this->logger->error("Error when trying to call Source {$config['source']} $message: {$e->getMessage()}", ['plugin' => 'common-gateway/customer-notifications-bundle']);
@@ -447,9 +467,13 @@ class NotificationsService
                 $oneOfFailed = true;
                 
                 foreach ($oneOf as $item) {
+                    if (empty($config[$item]) === false && $oneOfFailed === false) {
+                        $oneOfFailed = true;
+                        break;
+                    }
+                    
                     if (empty($config[$item]) === false) {
                         $oneOfFailed = false;
-                        break;
                     }
                 }
                 
