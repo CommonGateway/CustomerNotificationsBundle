@@ -364,8 +364,14 @@ class NotificationsService
             }
 
             $sourcePropertyValue = $response[$sourceProperty];
-
-            // Handle recursion, in the case we want to use the value from object in a source to do another call on a source...
+            
+            // Check for recursion, make sure 'forParentProperties' is present before we can continue with recursion.
+            if (empty($config['getObjectDataConfig']) === false && empty($config['getObjectDataConfig']['forParentProperties']) === true) {
+                $this->logger->error("The key forParentProperties does not exist or its value is empty in a getObjectDataConfig->getObjectDataConfig array.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
+                return null;
+            }
+            
+            // Handle recursion, in the case we want to use the value from an object in a source to do another call on a source.
             if (empty($config['getObjectDataConfig']) === false
                 && in_array($sourceProperty, $config['getObjectDataConfig']['forParentProperties']) === true
             ) {
@@ -374,7 +380,9 @@ class NotificationsService
             }
 
             // Make sure to update filter, replace {{property}} with the actual value.
-            $filter = str_replace("{{$sourceProperty}}", $sourcePropertyValue, $filter);
+            foreach ($filter as $key => $value) {
+                $filter[$key] = str_replace("{{$sourceProperty}}", $sourcePropertyValue, $value);
+            }
         }
 
         return $filter;
