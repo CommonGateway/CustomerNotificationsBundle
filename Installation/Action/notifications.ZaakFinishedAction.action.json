@@ -53,10 +53,16 @@
             "getObjectDataConfig": {
                 "notificationProperty": "body.hoofdObject",
                 "source": "source.ref",
-                "sourceProperties": ["propertyA"],
-                "searchSchemas": ["Entity ref or uuid"],
+                "sourceProperties": ["rollen"],
+                "getObjectDataConfig": {
+                    "source": "source.ref",
+                    "sourceProperties": ["bsn"],
+                    "forParentProperties": ["rollen"]
+                },
+                "searchSchemas": ["https://commongateway.nl/klant.partij.schema.json"],
                 "searchQuery": {
-                    "propertyB": "{{propertyA}}"
+                    "externeIdentificaties.partijIdentificator.objectId": "{{bsn}}",
+                    "externeIdentificaties.partijIdentificator.objecttype": "ingeschrevenpersoon"
                 }
             },
             "throw": "throwForEmailAction"

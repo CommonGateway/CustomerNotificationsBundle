@@ -312,18 +312,12 @@ class NotificationsService
     private function getObject(array $config): ?array
     {
         // Todo: validate if config has all the required config properties! In a separate function.
-        $config['dataKey'] = $config['notificationProperty'];
-        $response          = $this->callSource($config, 'while trying to get object data for email and/or sms');
-
         $filter = $config['searchQuery'];
-        foreach ($config['sourceProperties'] as $sourceProperty) {
-            if (empty($response[$sourceProperty]) === true) {
-                $this->logger->error("SourceProperty {$sourceProperty} does not exist or is empty.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
-                return null;
-            }
-
-            $sourcePropertyValue = $response[$config[$sourceProperty]];
-            $filter              = str_replace("{{$sourceProperty}}", $sourcePropertyValue, $filter);
+        
+        $config['dataKey'] = $config['notificationProperty'];
+        $filter = $this->addSourceDataToFilter($filter, $config);
+        if ($filter === null) {
+            return null;
         }
 
         $objects = $this->cacheService->searchObjects(null, $filter, $config['searchSchemas']);
@@ -337,14 +331,50 @@ class NotificationsService
         }
 
         return $objects['results'][0];
-
-    }//end getObject()
-
-
+    }
+    
+    
+    /**
+     * This function will update the given $filter array so that it contains the correct filter values, using data from sources outside the gateway.
+     * If configured correctly to do so. Note that this is a function with recursion.
+     *
+     * @param array $filter The filter array to update and add data gathered data from one or more Sources to.
+     * @param array $config The 'getObjectDataConfig' config (For EmailConfig or SMSConfig, or config used for recursion).
+     *
+     * @return array|null The updated $filter array.
+     */
+    private function addSourceDataToFilter(array $filter, array $config): ?array
+    {
+        $response = $this->callSource($config, 'while trying to get object data for email and/or sms');
+     
+        // Loop through the specific properties we want to use from the response of this source call.
+        foreach ($config['sourceProperties'] as $sourceProperty) {
+            if (empty($response[$sourceProperty]) === true) {
+                $this->logger->error("SourceProperty {$sourceProperty} does not exist or is empty.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
+                return null;
+            }
+            
+            $sourcePropertyValue = $response[$config[$sourceProperty]];
+            
+            // Handle recursion, in the case we want to use the value from object in a source to do another call on a source...
+            if (empty($config['getObjectDataConfig']) === false
+                && in_array($sourceProperty, $config['getObjectDataConfig']['forParentProperties']) === true
+            ) {
+                $config['getObjectDataConfig']['url'] = $sourcePropertyValue;
+                $filter = $this->addSourceDataToFilter($filter, $config['getObjectDataConfig']);
+            }
+            
+            // Make sure to update filter, replace {{property}} with the actual value.
+            $filter = str_replace("{{$sourceProperty}}", $sourcePropertyValue, $filter);
+        }
+        
+        return $filter;
+    }
+    
     /**
      * Does a $this->callService->call() on a $config['source'], using $this->data[$config['dataKey']] as url.
      *
-     * @param array  $config  A config array containing the 'source' = reference to a source & 'dataKey' = a property in the notification body.
+     * @param array $config A config array containing the 'source' = reference to a source & 'dataKey' or 'url' = a property in the notification body where to find an url, 'dataKey' or just the 'url'.
      * @param string $message A message to add to any error logs created.
      *
      * @return array|null The decoded response from the call.
@@ -355,10 +385,12 @@ class NotificationsService
         if ($source === null) {
             return null;
         }
-
-        $url      = $this->data[$config['dataKey']];
-        $endpoint = str_replace($source->getLocation(), '', $url);
-
+        
+        if (empty($config['url']) === true) {
+            $config['url'] = $this->data[$config['dataKey']];
+        }
+        $endpoint = str_replace($source->getLocation(), '', $config['url']);
+        
         try {
             $response        = $this->callService->call($source, $endpoint);
             $decodedResponse = json_decode($response->getBody()->getContents(), true);
