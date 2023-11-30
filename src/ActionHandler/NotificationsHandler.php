@@ -57,14 +57,14 @@ class NotificationsHandler implements ActionHandlerInterface
                 ],
                 'emailConfig'        => [
                     'type'        => 'array',
-                    'description' => 'Configuration for sending an email after the notification has been received. If not present no email will be send. "useObjectEntityData" can be used to configure what entity should be used for getting and adding ObjectEntity data to the email. "throw" is the event we should throw to trigger another EmailHandler action that will send the actual email.',
-                    'example'     => '{"useObjectEntityData":"https://example.nl/schema/example.partij.schema.json","throw":"notifications.zaak.created.email"}',
+                    'description' => 'Configuration for sending an email after the notification has been received. If not present no email will be send. "getObjectDataConfig" can be used to configure how to find and add the data of one ObjectEntity to the email message. "throw" is the event we should throw to trigger another EmailHandler action that will send the actual email. Extra details about "getObjectDataConfig"; "notificationProperty" = property from the notification to use to call the source. "source" = reference of the source to call. "sourceProperties" = array with property names to get from the response of the source. "searchSchemas" = array with Schema references to use when searching an Object in de Gateway. "searchQuery" = query array to use when searching an Object in de Gateway, use {{sourcePropertyName}} her to insert the values got using "sourceProperties."',
+                    'example'     => '{"getObjectDataConfig":"getObjectDataConfig":{"notificationProperty": "body.hoofdObject","source": "source.ref","sourceProperties": ["propertyAsource"],"searchSchemas": ["Entity ref or uuid"],"searchQuery": {"propertyBgateway": "{{propertyAsource}}"}},"throw":"notifications.zaak.created.email"}',
                     'nullable'    => true,
                 ],
                 'smsConfig'          => [
                     'type'        => 'array',
-                    'description' => 'Configuration for sending an sms after the notification has been received. If not present no sms will be send. "useObjectEntityData" can be used to configure what entity should be used for getting and adding ObjectEntity data to the sms message. "throw" is the event we should throw to trigger another SMSHandler action that will send the actual sms.',
-                    'example'     => '{"useObjectEntityData":"https://example.nl/schema/example.partij.schema.json","throw":"notifications.zaak.created.sms"}',
+                    'description' => 'Configuration for sending an sms after the notification has been received. If not present no sms will be send. "getObjectDataConfig" can be used to configure how to find and add the data of one ObjectEntity to the sms message, if set to "sameAsEmail" the same object as for email will be used. "throw" is the event we should throw to trigger another SMSHandler action that will send the actual sms.',
+                    'example'     => '{"getObjectDataConfig":"sameAsEmail","throw":"notifications.zaak.created.sms"}',
                     'nullable'    => true,
                 ],
                 'createObjectConfig' => [

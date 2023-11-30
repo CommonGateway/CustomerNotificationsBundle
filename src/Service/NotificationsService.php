@@ -132,13 +132,25 @@ class NotificationsService
         }
 
         $this->logger->debug("NotificationsBundler -> NotificationsService -> notificationsHandler()", ['plugin' => 'common-gateway/customer-notifications-bundle']);
-
-        $this->handleEmail();
-        $this->handleSMS();
-        $this->createObject();
-
-        // todo: improve response, depending on what this notification triggered? ',email send, ContactMoment Object created', etc.
-        $response         = ['Message' => 'Notification received.'];
+        
+        $message = 'Notification received';
+        
+        $email = $this->handleEmail();
+        if ($email !== null) {
+            $message = $message.", email send";
+        }
+        
+        $sms = $this->handleSMS();
+        if ($sms !== null) {
+            $message = $message.", sms send";
+        }
+        
+        $object = $this->handleObject();
+        if ($object !== null) {
+            $message = $message.", object created";
+        }
+        
+        $response         = ['Message' => $message.'.'];
         $data['response'] = new Response(json_encode($response), 200, ['Content-type' => 'application/json']);
 
         return $data;
@@ -195,24 +207,15 @@ class NotificationsService
             $this->logger->error("ExtraCondition $dataKey is missing the key = 'commongatewaySourceRef' (with = a Source reference)", ['plugin' => 'common-gateway/customer-notifications-bundle']);
             return false;
         }
-
-        $source = $this->resourceService->getSource($condition['commongatewaySource'], 'open-catalogi/open-catalogi-bundle');
-        if ($source === null) {
-            return false;
-        }
-
-        unset($condition['commongatewaySource']);
-
-        $url      = $this->data[$dataKey];
-        $endpoint = str_replace($source->getLocation(), '', $url);
-
-        try {
-            $response = $this->callService->call($source, $endpoint);
-        } catch (Exception $e) {
-            $this->logger->error("Error when trying to fetch $url while checking extraConditions: {$e->getMessage()}", ['plugin' => 'common-gateway/customer-notifications-bundle']);
-            return false;
-        }
-
+        
+        $response = $this->callSource([
+                'source' => $condition['commongatewaySourceRef'],
+                'dataKey' => $dataKey
+            ],
+            'while checking extraConditions'
+        );
+        
+        unset($condition['commongatewaySourceRef']);
         foreach ($condition as $key => $value) {
             if (isset($response[$key]) === false || $response[$key] != $value) {
                 $this->logger->debug("ExtraCondition $dataKey"."[$key] != $value.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
@@ -229,36 +232,31 @@ class NotificationsService
      * If emailConfig has been configured in the Action->configuration.
      * This function handles getting info for an email and throwing the email event that will trigger the actual email sending.
      *
-     * @return void
+     * @return array|null Return data from the thrown event. Or null.
      */
     private function handleEmail(): ?array
     {
-        // If there are is no emailConfig, return.
         if (empty($this->configuration['emailConfig']) === true) {
             return null;
         }
-
+        
         $emailConfig = $this->configuration['emailConfig'];
 
         if (empty($emailConfig['throw']) === true) {
             $this->logger->error("Action configuration emailConfig is missing the key = 'throw'.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
             return null;
         }
-
-        // Todo: duplicate code with sms?
-        if (empty($emailConfig['useObjectEntityData']) === false) {
-            // todo...
-            // Object id?
-            $id     = '';
-            $object = $this->cacheService->getObject($id, $emailConfig['useObjectEntityData']);
+        
+        // Let's see if we need to get an object to use its data for creating an email message.
+        if (empty($emailConfig['getObjectDataConfig']) === false) {
+            $object = $this->getObject($emailConfig['getObjectDataConfig']);
+            
+            // Set $object in $this->configuration to be re-used in SMSConfig, if configured to do so.
+            $this->configuration['emailConfig']['getObjectDataConfig']['SMSSameAsEmail'] = $object;
         }
 
         // Throw email event
-        $event = new ActionEvent('commongateway.action.event', ($object ?? []), $emailConfig['throw']);
-
-        $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
-
-        return $event->getData();
+        return $this->throwEvent($emailConfig, ($object ?? null));
 
     }//end handleEmail()
 
@@ -267,65 +265,152 @@ class NotificationsService
      * If smsConfig has been configured in the Action->configuration.
      * This function handles getting info for a sms and throwing the sms event that will trigger the actual sms sending.
      *
-     * @return void
+     * @return array|null Return data from the thrown event. Or null.
      */
-    private function handleSMS()
+    private function handleSMS(): ?array
     {
-        // If there are is no smsConfig, return.
         if (empty($this->configuration['smsConfig']) === true) {
-            return;
+            return null;
         }
-
+        
         $smsConfig = $this->configuration['smsConfig'];
 
         if (empty($smsConfig['throw']) === true) {
             $this->logger->error("Action configuration smsConfig is missing the key = 'throw'.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
-            return;
+            return null;
         }
-
-        // Todo: duplicate code with email?
-        if (empty($smsConfig['useObjectEntityData']) === false) {
-            // todo...
-            // Object id?
-            $id     = '';
-            $object = $this->cacheService->getObject($id, $smsConfig['useObjectEntityData']);
+        
+        // Let's see if we need to get an object to use its data for creating an SMS message.
+        if (empty($smsConfig['getObjectDataConfig']) === false) {
+            // If getObjectDataConfig for sms is configured to re-use the same object as for email, do so.
+            if ($smsConfig['getObjectDataConfig'] === 'sameAsEmail'
+                && empty($this->configuration['emailConfig']['getObjectDataConfig']['SMSSameAsEmail']) === false
+            ) {
+                $object = $this->configuration['emailConfig']['getObjectDataConfig']['SMSSameAsEmail'];
+            }
+            
+            if (empty($object) === true) {
+                $object = $this->getObject($smsConfig['getObjectDataConfig']);
+            }
         }
 
         // Throw sms event
-        $event = new ActionEvent('commongateway.action.event', ($object ?? []), $smsConfig['throw']);
-
-        $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
-
-        return $event->getData();
+        return $this->throwEvent($smsConfig, ($object ?? null));
 
     }//end handleSMS()
+    
+    
+    /**
+     * If getObjectDataConfig has been configured in the Action->configuration.
+     * This function uses email or SMS configuration to get object data, to use later for email/sms creation (to pass through the event thrown).
+     *
+     * @param array $config The EmailConfig or SMSConfig.
+     *
+     * @return array|null The object found or null.
+     */
+    private function getObject(array $config): ?array
+    {
+        // Todo: validate if config has all the required config properties! In a separate function.
+        
+        $config['dataKey'] = $config['notificationProperty'];
+        $response = $this->callSource($config, 'while trying to get object data for email and/or sms');
+        
+        $filter = $config['searchQuery'];
+        foreach ($config['sourceProperties'] as $sourceProperty) {
+            if (empty($response[$sourceProperty]) === true) {
+                $this->logger->error("SourceProperty {$sourceProperty} does not exist or is empty.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
+                return null;
+            }
+            
+            $sourcePropertyValue = $response[$config[$sourceProperty]];
+            $filter = str_replace("{{$sourceProperty}}", $sourcePropertyValue, $filter);
+        }
+        
+        $objects = $this->cacheService->searchObjects(null, $filter, $config['searchSchemas']);
+        if (empty($objects) === true || count($objects['results']) === 0) {
+            $this->logger->error("Couldn't find an object to use for email and/or sms data.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
+            return null;
+        }
+        
+        if (count($objects['results']) > 1) {
+            $this->logger->warning("Found more than one object to use for email and/or sms data.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
+        }
+        
+        return $objects['results'][0];
+    }
+    
+    /**
+     * Does a $this->callService->call() on a $config['source'], using $this->data[$config['dataKey']] as url.
+     *
+     * @param array $config A config array containing the 'source' = reference to a source & 'dataKey' = a property in the notification body.
+     * @param string $message A message to add to any error logs created.
+     *
+     * @return array|null The decoded response from the call.
+     */
+    private function callSource(array $config, string $message): ?array
+    {
+        $source = $this->resourceService->getSource($config['source'], 'open-catalogi/open-catalogi-bundle');
+        if ($source === null) {
+            return null;
+        }
+        
+        $url      = $this->data[$config['dataKey']];
+        $endpoint = str_replace($source->getLocation(), '', $url);
+        
+        try {
+            $response = $this->callService->call($source, $endpoint);
+            $decodedResponse = json_decode($response->getBody()->getContents(), true);
+        } catch (Exception $e) {
+            $this->logger->error("Error when trying to call Source {$config['source']} $message: {$e->getMessage()}", ['plugin' => 'common-gateway/customer-notifications-bundle']);
+            return null;
+        }
+        
+        return $decodedResponse;
+    }
+    
+    /**
+     * Throws a Gateway event, used for throwing the email and/or SMS event.
+     * Passes the $object array with the thrown event.
+     *
+     * @param array $config The EmailConfig or SMSConfig.
+     * @param array|null $object The object found or null.
+     *
+     * @return array Return data from the thrown event.
+     */
+    private function throwEvent(array $config, ?array $object): array
+    {
+        $event = new ActionEvent('commongateway.action.event', ($object ?? []), $config['throw']);
+        
+        $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
+        
+        return $event->getData();
+    }
 
 
     /**
      * If createObjectConfig has been configured in the Action->configuration.
      * This function will create an ObjectEntity using data from notification or other configured objects.
      *
-     * @return void
+     * @return array|null The Created Object. Or null.
      */
-    private function createObject()
+    private function handleObject(): ?array
     {
-        // If there are is no createObjectConfig, return.
         if (empty($this->configuration['createObjectConfig']) === true) {
-            return;
+            return null;
         }
-
+        
         $createObjectConfig = $this->configuration['createObjectConfig'];
 
         $schema = $this->resourceService->getSchema($createObjectConfig['schema'], 'open-catalogi/open-catalogi-bundle');
         if ($schema === null) {
-            return;
+            return null;
         }
 
         // todo...
         // Input for object creation?
         // Find (& do) Mapping
         // Create ObjectEntity
-        return;
+        return [];
 
     }//end createObject()
 

@@ -50,11 +50,19 @@
             }
         },
         "emailConfig": {
-            "useObjectEntityData": "Entity ref or uuid",
+            "getObjectDataConfig": {
+                "notificationProperty": "body.hoofdObject",
+                "source": "source.ref",
+                "sourceProperties": ["propertyA"],
+                "searchSchemas": ["Entity ref or uuid"],
+                "searchQuery": {
+                    "propertyB": "{{propertyA}}"
+                }
+            },
             "throw": "throwForEmailAction"
         },
         "smsConfig": {
-            "useObjectEntityData": "Entity ref or uuid",
+            "getObjectDataConfig": "sameAsEmail",
             "throw": "throwForSMSAction"
         },
         "createObjectConfig": {
