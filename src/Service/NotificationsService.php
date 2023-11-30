@@ -311,7 +311,10 @@ class NotificationsService
      */
     private function getObject(array $config): ?array
     {
-        // Todo: validate if config has all the required config properties! In a separate function.
+        if ($this->validateConfigArray(['notificationProperty', 'searchSchemas', 'searchQuery'], 'getObjectDataConfig', $config,) === false) {
+            return null;
+        }
+        
         $filter = $config['searchQuery'];
 
         $config['dataKey'] = $config['notificationProperty'];
@@ -346,6 +349,11 @@ class NotificationsService
      */
     private function addSourceDataToFilter(array $filter, array $config): ?array
     {
+        if (empty($config['sourceProperties']) === true) {
+            $this->logger->error("The key sourceProperties does not exist or its value is empty in a getObjectDataConfig array.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
+            return null;
+        }
+        
         $response = $this->callSource($config, 'while trying to get object data for email and/or sms');
 
         // Loop through the specific properties we want to use from the response of this source call.
@@ -355,7 +363,7 @@ class NotificationsService
                 return null;
             }
 
-            $sourcePropertyValue = $response[$config[$sourceProperty]];
+            $sourcePropertyValue = $response[$sourceProperty];
 
             // Handle recursion, in the case we want to use the value from object in a source to do another call on a source...
             if (empty($config['getObjectDataConfig']) === false
@@ -384,6 +392,10 @@ class NotificationsService
      */
     private function callSource(array $config, string $message): ?array
     {
+        if ($this->validateConfigArray(['source', 'url|or|dataKey'], 'getObjectDataConfig (parent or sub"getObjectDataConfig" array)', $config,) === false) {
+            return null;
+        }
+        
         $source = $this->resourceService->getSource($config['source'], 'open-catalogi/open-catalogi-bundle');
         if ($source === null) {
             return null;
@@ -406,6 +418,59 @@ class NotificationsService
         return $decodedResponse;
 
     }//end callSource()
+    
+    
+    /**
+     * Checks if given $config array has the $required keys and if not creates an error log.
+     *
+     * @param array $required The required keys. May contain a string containing "|or|" for an OneOf option.
+     * @param string $message A string added to the error message. To specify where in the action configuration this config is defined.
+     * @param array $config The config array to check if it contains the $required keys.
+     *
+     * @return bool True if $config array contains $required keys, else false.
+     */
+    private function validateConfigArray(array $required, string $message, array $config): bool
+    {
+        $missingKeys = [];
+        
+        foreach ($required as $requiredItem) {
+            if (str_contains($requiredItem, '|or|')) {
+                $oneOf = explode('|or|', $requiredItem);
+                $oneOfFailed = true;
+                
+                foreach ($oneOf as $item) {
+                    if (empty($config[$item]) === false) {
+                        $oneOfFailed = false;
+                        break;
+                    }
+                }
+                
+                if ($oneOfFailed === true) {
+                    $missingKeys[] = $requiredItem;
+                }
+                
+                continue;
+            }
+            
+            if (empty($config[$requiredItem]) === true) {
+                $missingKeys[] = $requiredItem;
+            }
+        }
+        
+        if (empty($missingKeys) === false) {
+            $this->logger->error(
+                "Action configuration $message is missing the following keys:".implode(',' ,$missingKeys),
+                array_merge(
+                    $config,
+                    ['plugin' => 'common-gateway/customer-notifications-bundle']
+                )
+            );
+            
+            return false;
+        }
+        
+        return true;
+    }
 
 
     /**
