@@ -46,10 +46,10 @@
         "emailConfig": {
             "getObjectDataConfig": {
                 "notificationProperty": "body.hoofdObject",
-                "source": "source.ref",
+                "source": "https://buren.nl/source/buren.zrc.source.json",
                 "sourceProperties": ["rollen"],
                 "getObjectDataConfig": {
-                    "source": "source.ref",
+                    "source": "https://buren.nl/source/buren.zrc.source.json",
                     "sourceProperties": ["bsn"],
                     "forParentProperties": ["rollen"]
                 },
