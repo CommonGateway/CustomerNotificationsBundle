@@ -516,7 +516,13 @@ class NotificationsService
      */
     private function throwEvent(array $config, ?array $object): array
     {
-        $event = new ActionEvent('commongateway.action.event', ($object ?? []), $config['throw']);
+        $eventData['notification']['body'] = $this->data['body'];
+        
+        if (empty($object) === false) {
+            $eventData['object'] = $object;
+        }
+        
+        $event = new ActionEvent('commongateway.action.event', $eventData, $config['throw']);
 
         $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
 
