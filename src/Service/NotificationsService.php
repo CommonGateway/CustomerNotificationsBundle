@@ -2,6 +2,7 @@
 
 namespace CommonGateway\CustomerNotificationsBundle\Service;
 
+use Adbar\Dot;
 use App\Entity\ObjectEntity;
 use App\Event\ActionEvent;
 use CommonGateway\CoreBundle\Service\CacheService;
@@ -23,20 +24,27 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class NotificationsService
 {
-
+    
     /**
      * Configuration array.
      *
      * @var array
      */
-    private array $configuration;
-
+    private array $configuration= [];
+    
     /**
      * Data array.
      *
      * @var array
      */
-    private array $data;
+    private array $data = [];
+    
+    /**
+     * Data array as an Adbar\Dot object.
+     *
+     * @var Dot|null
+     */
+    private ?Dot $dataDot = null;
 
     /**
      * The entity manager.
@@ -103,8 +111,6 @@ class NotificationsService
         $this->resourceService = $resourceService;
         $this->cacheService    = $cacheService;
         $this->eventDispatcher = $eventDispatcher;
-        $this->configuration   = [];
-        $this->data            = [];
 
     }//end __construct()
 
@@ -125,6 +131,7 @@ class NotificationsService
         }
 
         $this->data          = $data;
+        $this->dataDot       = new Dot($this->data);
         $this->configuration = $configuration;
 
         if ($this->handleExtraConditions() === false) {
@@ -171,7 +178,7 @@ class NotificationsService
         }
 
         foreach ($this->configuration['extraConditions'] as $dataKey => $condition) {
-            if (isset($this->data[$dataKey]) === false) {
+            if ($this->dataDot->has($dataKey) === false || empty($this->dataDot->get($dataKey)) === true) {
                 $this->logger->error("ExtraCondition $dataKey does not exist in the action data array.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
                 return false;
             }
@@ -291,8 +298,8 @@ class NotificationsService
             ) {
                 $object = $this->configuration['emailConfig']['getObjectDataConfig']['SMSSameAsEmail'];
             }
-
-            if (empty($object) === true) {
+            
+            if ($smsConfig['getObjectDataConfig'] !== 'sameAsEmail') {
                 $object = $this->getObject($smsConfig['getObjectDataConfig']);
             }
             
@@ -362,15 +369,16 @@ class NotificationsService
         }
         
         $response = $this->callSource($config, 'while trying to get object data for email and/or sms');
+        $responseDot = new Dot($response);
 
         // Loop through the specific properties we want to use from the response of this source call.
         foreach ($config['sourceProperties'] as $sourceProperty) {
-            if (empty($response[$sourceProperty]) === true) {
+            if ($responseDot->has($sourceProperty) === false || empty($responseDot->get($sourceProperty)) === true) {
                 $this->logger->error("SourceProperty {$sourceProperty} does not exist or is empty.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
                 return null;
             }
 
-            $sourcePropertyValue = $response[$sourceProperty];
+            $sourcePropertyValue = $responseDot->get($sourceProperty);
             
             // Check for recursion, make sure 'forParentProperties' is present before we can continue with recursion.
             if (empty($config['getObjectDataConfig']) === false && empty($config['getObjectDataConfig']['forParentProperties']) === true) {
@@ -398,16 +406,16 @@ class NotificationsService
 
 
     /**
-     * Does a $this->callService->call() on a $config['source'], using $this->data[$config['dataKey']] as url.
+     * Does a $this->callService->call() on a $config['source'], using $this->data[$config['dataKey']] as sourceEndpoint.
      *
-     * @param array  $config  A config array containing the 'source' = reference to a source & 'dataKey' or 'url' = a property in the notification body where to find an url, 'dataKey' or just the 'url'.
+     * @param array  $config  A config array containing the 'source' = reference to a source & 'dataKey' or 'sourceEndpoint' = a property in the notification body where to find an url, 'dataKey' or just the 'sourceEndpoint'.
      * @param string $message A message to add to any error logs created.
      *
      * @return array|null The decoded response from the call.
      */
     private function callSource(array $config, string $message): ?array
     {
-        if ($this->validateConfigArray(['source', 'url|or|dataKey'], 'getObjectDataConfig (parent or sub"getObjectDataConfig" array)', $config,) === false) {
+        if ($this->validateConfigArray(['source', 'sourceEndpoint|or|dataKey'], "getObjectDataConfig (parent or sub'getObjectDataConfig' array) ($message)", $config,) === false) {
             return null;
         }
         
@@ -417,7 +425,7 @@ class NotificationsService
         }
 
         if (empty($config['sourceEndpoint']) === true) {
-            $config['sourceEndpoint'] = $this->data[$config['dataKey']];
+            $config['sourceEndpoint'] = $this->dataDot->get($config['dataKey']);
         }
 
         $endpoint = str_replace($source->getLocation(), '', $config['sourceEndpoint']);
@@ -428,7 +436,7 @@ class NotificationsService
                 // Todo: replace this if statement & trim() with some fancy regex.
                 if (str_starts_with($query, '{{') === true && str_ends_with($query, '}}')) {
                     $query = trim($query, '{}');
-                    $config['sourceQuery'][$key] = $this->data[$query];
+                    $config['sourceQuery'][$key] = $this->dataDot->get($query);
                 }
             }
             
@@ -436,7 +444,7 @@ class NotificationsService
         }
 
         try {
-            $response        = $this->callService->call($source, $endpoint, $callConfig);
+            $response        = $this->callService->call($source, $endpoint, 'GET', $callConfig);
             $decodedResponse = json_decode($response->getBody()->getContents(), true);
         } catch (Exception $e) {
             $this->logger->error("Error when trying to call Source {$config['source']} $message: {$e->getMessage()}", ['plugin' => 'common-gateway/customer-notifications-bundle']);
