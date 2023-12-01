@@ -133,12 +133,16 @@ class NotificationsService
         $this->data          = $data;
         $this->dataDot       = new Dot($this->data);
         $this->configuration = $configuration;
-
-        if ($this->handleExtraConditions() === false) {
+        
+        $this->logger->debug("NotificationsBundler -> NotificationsService -> notificationsHandler()", ['plugin' => 'common-gateway/customer-notifications-bundle']);
+        
+        $extraConditions = $this->handleExtraConditions();
+        if ($extraConditions !== []) {
+            $response         = ['Message' => "Failed to match the following extraConditions", "ExtraConditions" => $extraConditions];
+            $data['response'] = new Response(json_encode($response), 200, ['Content-type' => 'application/json']);
+            
             return $data;
         }
-
-        $this->logger->debug("NotificationsBundler -> NotificationsService -> notificationsHandler()", ['plugin' => 'common-gateway/customer-notifications-bundle']);
 
         $message = 'Notification received';
 
@@ -163,77 +167,40 @@ class NotificationsService
         return $data;
 
     }//end notificationsHandler()
-
-
+    
+    
     /**
      * If the action configuration contains extraConditions, check if these conditions are met.
      *
-     * @return bool True if conditions are met, else false.
+     * @return array Empty array if conditions are met, else an array with the failed conditions or an error message.
      */
-    private function handleExtraConditions(): bool
+    private function handleExtraConditions(): array
     {
         // If there are no extra conditions return true.
         if (empty($this->configuration['extraConditions']) === true) {
-            return true;
+            return [];
         }
-
-        foreach ($this->configuration['extraConditions'] as $dataKey => $condition) {
-            if ($this->dataDot->has($dataKey) === false || empty($this->dataDot->get($dataKey)) === true) {
-                $this->logger->error("ExtraCondition $dataKey does not exist in the action data array.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
-                return false;
-            }
-
-            switch ($dataKey) {
-            case 'body.hoofdObject':
-            case 'body.resourceUrl':
-                return $this->handleUrlCondition($dataKey, $condition);
-            default:
-                $this->logger->error("Couldn't find any logic for extraCondition $dataKey.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
-                break;
-            }
+        
+        $extraConditions = $this->configuration['extraConditions'];
+        
+        if ($this->validateConfigArray(['getObjectDataConfig', 'conditions'], 'extraConditions', $extraConditions) === false) {
+            return ['Message' => 'Action->configuration should have the following keys in extraConditions', "extraConditions" => ['getObjectDataConfig', 'conditions']];
         }
-
-        return true;
-
-    }//end handleExtraConditions()
-
-
-    /**
-     * Check if expected conditions are met for an $this->data field that contains an url.
-     * First does a get call on this url, then checks if response matches the given $condition array.
-     *
-     * @param string $dataKey   The key used for checking a specific field in the $this->data array.
-     * @param array  $condition The condition (array) to be met.
-     *
-     * @return bool True if condition is met, else false.
-     */
-    private function handleUrlCondition(string $dataKey, array $condition): bool
-    {
-        // Todo: Maybe we could/should support multiple Sources instead of one?
-        if (empty($condition['commongatewaySourceRef']) === true) {
-            $this->logger->error("ExtraCondition $dataKey is missing the key = 'commongatewaySourceRef' (with = a Source reference)", ['plugin' => 'common-gateway/customer-notifications-bundle']);
-            return false;
-        }
-
-        $response = $this->callSource(
-            [
-                'source'  => $condition['commongatewaySourceRef'],
-                'dataKey' => $dataKey,
-            ],
-            'while checking extraConditions'
+        
+        $checkedConditions = $this->handleObjectDataConfig(
+            $extraConditions['conditions'],
+            $extraConditions['getObjectDataConfig'],
+            'extraConditions'
         );
-
-        unset($condition['commongatewaySourceRef']);
-        foreach ($condition as $key => $value) {
-            if (isset($response[$key]) === false || $response[$key] != $value) {
-                $this->logger->debug("ExtraCondition $dataKey"."[$key] != $value.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
-                return false;
-            }
+        
+        // We unset all conditions that have been met, array should be empty at this point.
+        if (empty($checkedConditions) === false) {
+            return $checkedConditions;
         }
-
-        return true;
-
-    }//end handleUrlCondition()
+        
+        return [];
+        
+    }//end handleExtraConditions()
 
 
     /**
@@ -322,17 +289,13 @@ class NotificationsService
      */
     private function getObject(array $config): ?array
     {
-        if ($this->validateConfigArray(['notificationProperty|or|sourceEndpoint', 'searchSchemas', 'searchQuery'], 'getObjectDataConfig', $config,) === false) {
+        if ($this->validateConfigArray(['notificationProperty|or|sourceEndpoint', 'searchSchemas', 'searchQuery'], 'email or sms getObjectDataConfig', $config,) === false) {
             return null;
         }
         
         $filter = $config['searchQuery'];
-
-        if (empty($config['sourceEndpoint']) === true) {
-            $config['dataKey'] = $config['notificationProperty'];
-        }
         
-        $filter            = $this->addSourceDataToFilter($filter, $config);
+        $filter = $this->handleObjectDataConfig($filter, $config, 'emailOrSMSConfig');
         if ($filter === null) {
             return null;
         }
@@ -346,22 +309,26 @@ class NotificationsService
         if (count($objects['results']) > 1) {
             $this->logger->warning("Found more than one object to use for email and/or sms data.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
         }
-
-        return $objects['results'][0];
+        
+        // Deal with MongoDBDocuments...
+        return json_decode(json_encode($objects['results'][0]), true);
 
     }//end getObject()
 
 
     /**
-     * This function will update the given $filter array so that it contains the correct filter values, using data from sources outside the gateway.
-     * If configured correctly to do so. Note that this is a function with recursion.
+     * Depending on the $variant used this function behaves differently. But for both variants this function uses data from an getObjectDataConfig array to get data from sources outside the gateway
+     * 'extraConditions' = This function will check the conditions from the given $conditions array and removes all conditions that are met.
+     * 'emailOrSMSConfig' = This function will update the given $filter array so that it contains the correct filter values.
+     * If configured correctly to do so this is a function with recursion.
      *
-     * @param array $filter The filter array to update and add data gathered data from one or more Sources to.
-     * @param array $config The 'getObjectDataConfig' config (For EmailConfig or SMSConfig, or config used for recursion).
+     * @param array $conditionsOrFilter The Conditions to check for extraConditions. Or the filter array to update and add data gathered data from one or more Sources to.
+     * @param array $config   The 'getObjectDataConfig' config (For ExtraConditions, EmailConfig, SMSConfig, or config used for recursion).
+     * @param string $variant Enum = ['extraConditions', 'emailOrSMSConfig']. Depending on which type of action->configuration (ObjectDataConfig) we are handling.
      *
-     * @return array|null The updated $filter array.
+     * @return array|null The updated $conditions array. Or the updated $filter array.
      */
-    private function addSourceDataToFilter(array $filter, array $config): ?array
+    private function handleObjectDataConfig(array $conditionsOrFilter, array $config, string $variant): ?array
     {
         if (empty($config['sourceProperties']) === true) {
             $this->logger->error("The key sourceProperties does not exist or its value is empty in a getObjectDataConfig array.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
@@ -391,31 +358,86 @@ class NotificationsService
                 && in_array($sourceProperty, $config['getObjectDataConfig']['forParentProperties']) === true
             ) {
                 $config['getObjectDataConfig']['sourceEndpoint'] = $sourcePropertyValue;
-                $filter                                    = $this->addSourceDataToFilter($filter, $config['getObjectDataConfig']);
+                $conditionsOrFilter = $this->handleObjectDataConfig($conditionsOrFilter, $config['getObjectDataConfig'], $variant);
             }
-
-            // Make sure to update filter, replace {{property}} with the actual value.
-            foreach ($filter as $key => $value) {
-                $filter[$key] = str_replace("{{$sourceProperty}}", $sourcePropertyValue, $value);
+            
+            if ($variant === 'extraConditions') {
+                $conditionsOrFilter = $this->checkExtraConditions($conditionsOrFilter, $sourceProperty, $sourcePropertyValue);
+            }
+            
+            if ($variant === 'emailOrSMSConfig') {
+                $conditionsOrFilter = $this->addSourceDataToFilter($conditionsOrFilter, $sourceProperty, $sourcePropertyValue);
             }
         }
 
-        return $filter;
+        return $conditionsOrFilter;
 
     }//end addSourceDataToFilter()
+    
+    
+    /**
+     * Handles logic for handleObjectDataConfig() variant 'extraConditions'.
+     * This function checks if given $conditions array contains the $sourceProperty key and if the value for this conditions matches the given $sourcePropertyValue.
+     * Will unset $sourceProperty from conditions if the condition has been met.
+     *
+     * @param array $conditions The conditions that have to be met.
+     * @param string $sourceProperty The source property to check.
+     * @param mixed $sourcePropertyValue The value for this key to compare.
+     *
+     * @return array The updated or unchanged $conditions array.
+     */
+    private function checkExtraConditions(array $conditions, string $sourceProperty, $sourcePropertyValue): array
+    {
+        // If this sourceProperty doesn't need to be checked.
+        if (isset($conditions[$sourceProperty]) === false) {
+            return $conditions;
+        }
+        
+        // If conditions isn't met
+        if ($conditions[$sourceProperty] != $sourcePropertyValue) {
+            $this->logger->debug("ExtraCondition $sourceProperty doesn't match expected condition.", ['expectedCondition' => $conditions[$sourceProperty],'sourcePropertyValue' => $sourcePropertyValue, 'plugin' => 'common-gateway/customer-notifications-bundle']);
+            return $conditions;
+        }
+        
+        // Make sure to unset from $conditions array so we later know conditions where met.
+        unset($conditions[$sourceProperty]);
+        
+        return $conditions;
+    }
+    
+    /**
+     * Handles logic for handleObjectDataConfig() variant 'emailOrSMSConfig'.
+     * This function will check if given $sourceProperty key is present in the given $filter array.
+     * Overwrites every {{$sourceProperty}} with the given $sourcePropertyValue.
+     *
+     * @param array $filter The filter array to update.
+     * @param string $sourceProperty The source property to check.
+     * @param mixed $sourcePropertyValue The value of the $sourceProperty key.
+     *
+     * @return array The updated $filter array.
+     */
+    private function addSourceDataToFilter(array $filter, string $sourceProperty, $sourcePropertyValue): array
+    {
+        // Make sure to update filter, replace {{property}} with the actual value.
+        foreach ($filter as $key => $value) {
+            $filter[$key] = str_replace("{{{$sourceProperty}}}", $sourcePropertyValue, $value);
+        }
+        
+        return $filter;
+    }
 
 
     /**
-     * Does a $this->callService->call() on a $config['source'], using $this->data[$config['dataKey']] as sourceEndpoint.
+     * Does a $this->callService->call() on a $config['source'], using $this->data[$config['notificationProperty']] as sourceEndpoint.
      *
-     * @param array  $config  A config array containing the 'source' = reference to a source & 'dataKey' or 'sourceEndpoint' = a property in the notification body where to find an url, 'dataKey' or just the 'sourceEndpoint'.
+     * @param array  $config  A config array containing the 'source' = reference to a source & 'notificationProperty' or 'sourceEndpoint' = a property in the notification body where to find an url, 'notificationProperty' or just the 'sourceEndpoint'.
      * @param string $message A message to add to any error logs created.
      *
      * @return array|null The decoded response from the call.
      */
     private function callSource(array $config, string $message): ?array
     {
-        if ($this->validateConfigArray(['source', 'sourceEndpoint|or|dataKey'], "getObjectDataConfig (parent or sub'getObjectDataConfig' array) ($message)", $config,) === false) {
+        if ($this->validateConfigArray(['source', 'sourceEndpoint|or|notificationProperty'], "getObjectDataConfig (parent or sub'getObjectDataConfig' array) ($message)", $config,) === false) {
             return null;
         }
         
@@ -425,7 +447,7 @@ class NotificationsService
         }
 
         if (empty($config['sourceEndpoint']) === true) {
-            $config['sourceEndpoint'] = $this->dataDot->get($config['dataKey']);
+            $config['sourceEndpoint'] = $this->dataDot->get($config['notificationProperty']);
         }
 
         $endpoint = str_replace($source->getLocation(), '', $config['sourceEndpoint']);

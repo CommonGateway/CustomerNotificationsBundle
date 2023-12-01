@@ -44,9 +44,18 @@
     "class": "CommonGateway\\CustomerNotificationsBundle\\ActionHandler\\NotificationsHandler",
     "configuration": {
         "extraConditions": {
-            "body.resourceUrl": {
-                "commongatewaySourceRef": "https://buren.nl/source/buren.zrc.source.json",
-                "statustype": "https://afgerondStatusTypeUrl"
+            "getObjectDataConfig": {
+                "source": "https://buren.nl/source/buren.zrc.source.json",
+                "notificationProperty": "body.resourceUrl",
+                "sourceProperties": ["statustype"],
+                "getObjectDataConfig": {
+                    "forParentProperties": ["statustype"],
+                    "source": "https://buren.nl/source/buren.ztc.source.json",
+                    "sourceProperties": ["isEindstatus"]
+                }
+            },
+            "conditions": {
+                "isEindstatus": true
             }
         },
         "emailConfig": {
