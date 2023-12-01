@@ -23,15 +23,21 @@ use Twig\Error\SyntaxError;
  */
 class EmailService
 {
+
     private Environment $twig;
+
     private array $data;
+
     private array $configuration;
+
 
     public function __construct(
         Environment $twig
     ) {
         $this->twig = $twig;
-    }
+
+    }//end __construct()
+
 
     /**
      * Handles the sending of an email based on an event.
@@ -45,13 +51,15 @@ class EmailService
      */
     public function EmailHandler(array $data, array $configuration): array
     {
-        $this->data = $data;
+        $this->data          = $data;
         $this->configuration = $configuration;
 
         $this->sendEmail();
 
         return $data;
-    }
+
+    }//end EmailHandler()
+
 
     /**
      * Sends and email using an EmailTemplate with configuration for it. It is possible to use $object data in the email if configured right.
@@ -66,7 +74,7 @@ class EmailService
     {
         // Create mailer with mailgun url
         $transport = Transport::fromDsn($this->configuration['serviceDNS']);
-        $mailer = new Mailer($transport);
+        $mailer    = new Mailer($transport);
 
         // Ready the email template with configured variables
         $variables = [];
@@ -75,7 +83,7 @@ class EmailService
             // Response is the default used for creating emails after an /api endpoint has been called and returned a response.
             if (isset($this->data['response']) === true && array_key_exists($variable, $this->data['response'])) {
                 $variables[$key] = $this->data['response'][$variable];
-            } elseif (array_key_exists($variable, $this->data)) {
+            } else if (array_key_exists($variable, $this->data)) {
                 $variables[$key] = $this->data[$variable];
             }
         }
@@ -85,9 +93,9 @@ class EmailService
         $text = strip_tags(preg_replace('#<br\s*/?>#i', "\n", $html), '\n');
 
         // Lets allow the use of values from the object Created/Updated with {attributeName.attributeName} in the these^ strings.
-        $subject = $this->twig->createTemplate($this->configuration['subject'])->render($variables);
+        $subject  = $this->twig->createTemplate($this->configuration['subject'])->render($variables);
         $receiver = $this->twig->createTemplate($this->configuration['receiver'])->render($variables);
-        $sender = $this->twig->createTemplate($this->configuration['sender'])->render($variables);
+        $sender   = $this->twig->createTemplate($this->configuration['sender'])->render($variables);
 
         // If we have no sender, set sender to receiver
         if (!$sender) {
@@ -98,10 +106,10 @@ class EmailService
         $email = (new Email())
             ->from($sender)
             ->to($receiver)
-            //->cc('cc@example.com')
-            //->bcc('bcc@example.com')
-            //->replyTo('fabien@example.com')
-            //->priority(Email::PRIORITY_HIGH)
+            // ->cc('cc@example.com')
+            // ->bcc('bcc@example.com')
+            // ->replyTo('fabien@example.com')
+            // ->priority(Email::PRIORITY_HIGH)
             ->subject($subject)
             ->html($html)
             ->text($text);
@@ -124,11 +132,15 @@ class EmailService
         }
 
         // todo: attachments
-
         // Send the email
-        /** @var Symfony\Component\Mailer\SentMessage $sentEmail */
+        /*
+         * @var Symfony\Component\Mailer\SentMessage $sentEmail
+         */
         $mailer->send($email);
 
         return true;
-    }
-}
+
+    }//end sendEmail()
+
+
+}//end class
