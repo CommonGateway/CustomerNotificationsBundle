@@ -58,11 +58,11 @@
                     "externeIdentificaties.partijIdentificator.objecttype": "ingeschrevenpersoon"
                 }
             },
-            "throw": "throwForEmailAction"
+            "throw": "notifications.zaak.created.email"
         },
         "smsConfig": {
             "getObjectDataConfig": "sameAsEmail",
-            "throw": "throwForSMSAction"
+            "throw": "notifications.zaak.created.sms"
         },
         "createObjectConfig": {
             "schema": "Entity ref or uuid",
