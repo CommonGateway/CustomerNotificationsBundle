@@ -44,13 +44,29 @@
     "class": "CommonGateway\\CustomerNotificationsBundle\\ActionHandler\\NotificationsHandler",
     "configuration": {
         "emailConfig": {
-            "useObjectEntityData": "Entity ref or uuid",
+            "getObjectDataConfig": {
+                "source": "https://buren.nl/source/buren.zrc.source.json",
+                "sourceEndpoint": "/rollen",
+                "sourceQuery": {
+                    "zaak": "{{body.hoofdObject}}",
+                    "omschrijvingGeneriek": "initiator"
+                },
+                "sourceProperties": ["results.0.betrokkeneIdentificatie.inpBsn"],
+                "searchSchemas": ["https://commongateway.nl/klant.partij.schema.json"],
+                "searchQuery": {
+                    "externeIdentificaties.partijIdentificator.objectId": "{{results.0.betrokkeneIdentificatie.inpBsn}}",
+                    "externeIdentificaties.partijIdentificator.objecttype": "ingeschrevenpersoon"
+                }
+            },
             "throw": "throwForEmailAction"
         },
         "smsConfig": {
-            "useObjectEntityData": "Entity ref or uuid",
+            "getObjectDataConfig": "sameAsEmail",
             "throw": "throwForSMSAction"
         },
-        "contactMomentEntity": "Entity ref or uuid"
+        "createObjectConfig": {
+            "schema": "Entity ref or uuid",
+            "mapping": "Mapping ref or uuid"
+        }
     }
 }
