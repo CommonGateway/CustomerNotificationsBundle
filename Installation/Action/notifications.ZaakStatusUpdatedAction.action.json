@@ -4,7 +4,6 @@
     "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
     "version": "0.0.1",
     "listens": ["notifications.notification.created"],
-    "isEnabled": false,
     "conditions":
     {
         "and": [
@@ -44,6 +43,21 @@
     },
     "class": "CommonGateway\\CustomerNotificationsBundle\\ActionHandler\\NotificationsHandler",
     "configuration": {
+        "extraConditions": {
+            "getObjectDataConfig": {
+                "source": "https://buren.nl/source/buren.zrc.source.json",
+                "notificationProperty": "body.resourceUrl",
+                "sourceProperties": ["statustype"],
+                "getObjectDataConfig": {
+                    "forParentProperties": ["statustype"],
+                    "source": "https://buren.nl/source/buren.ztc.source.json",
+                    "sourceProperties": ["isEindstatus"]
+                }
+            },
+            "conditions": {
+                "isEindstatus": false
+            }
+        },
         "emailConfig": {
             "getObjectDataConfig": {
                 "source": "https://buren.nl/source/buren.zrc.source.json",
