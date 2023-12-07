@@ -467,7 +467,7 @@ class NotificationsService
 
         try {
             $response        = $this->callService->call($source, $endpoint, 'GET', $callConfig);
-            $decodedResponse = \Safe\json_decode($response->getBody()->getContents(), true);
+            $decodedResponse = $this->callService->decodeResponse($source, $response);
         } catch (Exception $e) {
             $this->logger->error("Error when trying to call Source {$config['source']} $message: {$e->getMessage()}", ['plugin' => 'common-gateway/customer-notifications-bundle']);
             return null;
