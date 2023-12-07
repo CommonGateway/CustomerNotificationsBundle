@@ -2,8 +2,8 @@
 
 namespace CommonGateway\CustomerNotificationsBundle\ActionHandler;
 
-use App\ActionHandler\ActionHandlerInterface;
-use App\Service\EmailService;
+use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
+use CommonGateway\CustomerNotificationsBundle\Service\EmailService;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
