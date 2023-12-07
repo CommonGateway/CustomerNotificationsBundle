@@ -2,7 +2,7 @@
 
 namespace CommonGateway\CustomerNotificationsBundle\Service;
 
-use App\Service\Symfony;
+use Adbar\Dot;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport;
@@ -11,8 +11,6 @@ use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
-
-// todo: move this to an email plugin with the following packages from composer.json: symfony/mailer, symfony/mailgun-mailer, symfony/sendinblue-mailer & symfony/http-client
 
 /**
  * @Author Wilco Louwerse <wilco@conduction.nl>, Ruben van der Linde <ruben@conduction.nl>, Sarai Misidjan <sarai@conduction.nl>
@@ -79,13 +77,18 @@ class EmailService
         // Ready the email template with configured variables
         $variables = [];
 
+        $dataDot = new Dot($this->data);
         foreach ($this->configuration['variables'] as $key => $variable) {
             // Response is the default used for creating emails after an /api endpoint has been called and returned a response.
-            if (isset($this->data['response']) === true && array_key_exists($variable, $this->data['response'])) {
-                $variables[$key] = $this->data['response'][$variable];
-            } else if (array_key_exists($variable, $this->data)) {
-                $variables[$key] = $this->data[$variable];
+            if ($dataDot->has('response'.$variable) === true) {
+                $variables[$key] = $dataDot->get('response'.$variable);
+                continue;
             }
+            if ($dataDot->has($variable) === true) {
+                $variables[$key] = $dataDot->get($variable);
+                continue;
+            }
+            $variables[$key] = $variable;
         }
 
         // Render the template
@@ -115,19 +118,19 @@ class EmailService
             ->text($text);
 
         // Then we can handle some optional configuration
-        if (array_key_exists('cc', $this->configuration)) {
+        if (empty($this->configuration['cc']) === false) {
             $email->cc($this->configuration['cc']);
         }
 
-        if (array_key_exists('bcc', $this->configuration)) {
+        if (empty($this->configuration['bcc']) === false) {
             $email->bcc($this->configuration['bcc']);
         }
 
-        if (array_key_exists('replyTo', $this->configuration)) {
+        if (empty($this->configuration['replyTo']) === false) {
             $email->replyTo($this->configuration['replyTo']);
         }
 
-        if (array_key_exists('priority', $this->configuration)) {
+        if (empty($this->configuration['priority']) === false) {
             $email->priority($this->configuration['priority']);
         }
 
