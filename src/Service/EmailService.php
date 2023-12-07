@@ -84,10 +84,12 @@ class EmailService
                 $variables[$key] = $dataDot->get('response'.$variable);
                 continue;
             }
+
             if ($dataDot->has($variable) === true) {
                 $variables[$key] = $dataDot->get($variable);
                 continue;
             }
+
             $variables[$key] = $variable;
         }
 
