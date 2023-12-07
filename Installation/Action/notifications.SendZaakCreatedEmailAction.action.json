@@ -8,7 +8,7 @@
     {
         "==": [1, 1]
     },
-    "class": "App\\ActionHandler\\EmailHandler",
+    "class": "CommonGateway\\CustomerNotificationsBundle\\ActionHandler\\EmailHandler",
     "configuration":
     {
         "serviceDNS": "",
