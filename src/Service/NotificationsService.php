@@ -139,7 +139,7 @@ class NotificationsService
         $extraConditions = $this->handleExtraConditions();
         if ($extraConditions !== []) {
             $response         = ['Message' => "Failed to match the following extraConditions", "ExtraConditions" => $extraConditions];
-            $data['response'] = new Response(json_encode($response), 200, ['Content-type' => 'application/json']);
+            $data['response'] = new Response(\Safe\json_encode($response), 200, ['Content-type' => 'application/json']);
             
             return $data;
         }
@@ -162,7 +162,7 @@ class NotificationsService
         }
 
         $response         = ['Message' => $message.'.'];
-        $data['response'] = new Response(json_encode($response), 200, ['Content-type' => 'application/json']);
+        $data['response'] = new Response(\Safe\json_encode($response), 200, ['Content-type' => 'application/json']);
 
         return $data;
 
@@ -311,7 +311,7 @@ class NotificationsService
         }
         
         // Deal with MongoDBDocuments...
-        return json_decode(json_encode($objects['results'][0]), true);
+        return \Safe\json_decode(\Safe\json_encode($objects['results'][0]), true);
 
     }//end getObject()
 
@@ -467,7 +467,7 @@ class NotificationsService
 
         try {
             $response        = $this->callService->call($source, $endpoint, 'GET', $callConfig);
-            $decodedResponse = json_decode($response->getBody()->getContents(), true);
+            $decodedResponse = \Safe\json_decode($response->getBody()->getContents(), true);
         } catch (Exception $e) {
             $this->logger->error("Error when trying to call Source {$config['source']} $message: {$e->getMessage()}", ['plugin' => 'common-gateway/customer-notifications-bundle']);
             return null;
