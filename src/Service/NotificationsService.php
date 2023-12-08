@@ -147,17 +147,17 @@ class NotificationsService
         $message = 'Notification received';
 
         $email = $this->handleEmail();
-        if ($email !== null) {
+        if (empty($email) === false) {
             $message = $message.", email send";
         }
 
         $sms = $this->handleSMS();
-        if ($sms !== null) {
+        if (empty($sms) === false) {
             $message = $message.", sms send";
         }
 
         $object = $this->handleObject();
-        if ($object !== null) {
+        if (empty($object) === false) {
             $message = $message.", object created";
         }
 
@@ -231,6 +231,17 @@ class NotificationsService
             
             // Todo: do we want to continue sending an email if we didn't find an object?
         }
+        
+        // Check objectConditions.
+        if (empty($object) === false && empty($emailConfig['objectConditions']) === false) {
+            $objectDot = new Dot($object);
+            foreach ($emailConfig['objectConditions'] as $key => $condition) {
+                if ($objectDot->has($key) === false || $objectDot->get($key) != $condition) {
+                    $this->logger->info("Action configuration emailConfig objectConditions are not met, we don't need to send an email.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
+                    return null;
+                }
+            }
+        }
 
         // Throw email event
         return $this->throwEvent($emailConfig, ($object ?? null));
@@ -273,6 +284,17 @@ class NotificationsService
             }
             
             // Todo: do we want to continue sending an sms if we didn't find an object?
+        }
+        
+        // Check objectConditions.
+        if (empty($object) === false && empty($smsConfig['objectConditions']) === false) {
+            $objectDot = new Dot($object);
+            foreach ($smsConfig['objectConditions'] as $key => $condition) {
+                if ($objectDot->has($key) === false || $objectDot->get($key) != $condition) {
+                    $this->logger->info("Action configuration emailConfig objectConditions are not met, we don't need to send an email.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
+                    return null;
+                }
+            }
         }
 
         // Throw sms event

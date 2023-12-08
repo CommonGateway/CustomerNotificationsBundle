@@ -59,10 +59,16 @@
                     "externeIdentificaties.partijIdentificator.objecttype": "ingeschrevenpersoon"
                 }
             },
+            "objectConditions": {
+                "voorkeurskanaal.soortDigitaalAdres": "emailadres"
+            },
             "throw": "notifications.zaak.created.email"
         },
         "smsConfig": {
             "getObjectDataConfig": "sameAsEmail",
+            "objectConditions": {
+                "voorkeurskanaal.soortDigitaalAdres": "telefoonnummer"
+            },
             "throw": "notifications.zaak.created.sms"
         },
         "createObjectConfig": {
