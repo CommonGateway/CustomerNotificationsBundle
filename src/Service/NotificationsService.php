@@ -260,10 +260,12 @@ class NotificationsService
         // Let's see if we need to get an object to use its data for creating an SMS message.
         if (empty($smsConfig['getObjectDataConfig']) === false) {
             // If getObjectDataConfig for sms is configured to re-use the same object as for email, do so.
-            if ($smsConfig['getObjectDataConfig'] === 'sameAsEmail'
-                && empty($this->configuration['emailConfig']['getObjectDataConfig']['SMSSameAsEmail']) === false
-            ) {
-                $object = $this->configuration['emailConfig']['getObjectDataConfig']['SMSSameAsEmail'];
+            if ($smsConfig['getObjectDataConfig'] === 'sameAsEmail') {
+                if (empty($this->configuration['emailConfig']['getObjectDataConfig']['SMSSameAsEmail']) === false) {
+                    $object = $this->configuration['emailConfig']['getObjectDataConfig']['SMSSameAsEmail'];
+                } elseif (empty($this->configuration['emailConfig']['getObjectDataConfig']) === false) {
+                    $smsConfig['getObjectDataConfig'] = $this->configuration['emailConfig']['getObjectDataConfig'];
+                }
             }
             
             if ($smsConfig['getObjectDataConfig'] !== 'sameAsEmail') {
@@ -472,10 +474,13 @@ class NotificationsService
      */
     private function eventAddSourceData(string $sourceRef, string $type): ?array
     {
-        if ($sourceRef === 'sameAsEmail'
-            && empty($this->configuration['emailConfig'][$type]['SMSSameAsEmail']) === false
-        ) {
-            return $this->configuration['emailConfig'][$type]['SMSSameAsEmail'];
+        if ($sourceRef === 'sameAsEmail') {
+            if (empty($this->configuration['emailConfig'][$type.'Source']['SMSSameAsEmail']) === false) {
+                return $this->configuration['emailConfig'][$type.'Source']['SMSSameAsEmail'];
+            }
+            if (empty($this->configuration['emailConfig'][$type.'Source']['SMSSameAsEmail']) === false) {
+                $sourceRef = $this->configuration['emailConfig'][$type.'Source'];
+            }
         }
         
         if ($sourceRef !== 'sameAsEmail') {

@@ -89,8 +89,12 @@ class EmailService
                 $variables[$key] = $dataDot->get($variable);
                 continue;
             }
-
-            $variables[$key] = $variable;
+            
+            if ((str_contains($variable, '{%') === true && str_contains($variable, '%}') === true)
+                || (str_contains($variable, '{{') === true && str_contains($variable, '}}') === true)
+            ) {
+                $variable[$key] = $this->twig->createTemplate($variable)->render($variables);
+            }
         }
 
         // Render the template
