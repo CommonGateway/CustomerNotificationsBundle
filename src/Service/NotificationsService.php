@@ -335,7 +335,7 @@ class NotificationsService
             return null;
         }
         
-        $response = $this->callSource($config, 'while trying to get object data for email and/or sms');
+        $response = $this->callSource($config, ["getObjectDataConfig (parent or sub'getObjectDataConfig' array)", 'while trying to get object data for email and/or sms']);
         $responseDot = new Dot($response);
 
         // Loop through the specific properties we want to use from the response of this source call.
@@ -425,23 +425,90 @@ class NotificationsService
         
         return $filter;
     }
-
+    
+    
+    /**
+     * Throws a Gateway event, used for throwing the email and/or SMS event.
+     * Passes the $object array with the thrown event.
+     *
+     * @param array      $config The EmailConfig or SMSConfig.
+     * @param array|null $object The object found or null.
+     *
+     * @return array Return data from the thrown event.
+     */
+    private function throwEvent(array $config, ?array $object): array
+    {
+        $eventData['notification']['body'] = $this->data['body'];
+        
+        if (empty($object) === false) {
+            $eventData['object'] = $object;
+        }
+        
+        if (empty($config['hoofdObjectSource']) === false) {
+            $eventData['hoofdObject'] = $this->eventAddSourceData($config['hoofdObjectSource'], 'hoofdObject');
+        }
+        
+        if (empty($config['resourceUrlSource']) === false) {
+            $eventData['resourceUrl'] = $this->eventAddSourceData($config['resourceUrlSource'], 'resourceUrl');
+        }
+        
+        $event = new ActionEvent('commongateway.action.event', $eventData, $config['throw']);
+        
+        $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
+        
+        return $event->getData();
+        
+    }//end throwEvent()
+    
+    
+    /**
+     * Uses given $sourceRef & $type input to callSource() and get data for an object from a Source. (specifically for the hoofdObject url or resourceUrl).
+     * Todo: We might need to add some recursion here, in order to do calls on Sources for subobject urls. This would also mean we need to update configuration and Handler configuration descriptions.
+     *
+     * @param string $sourceRef A reference of a source or the string 'sameAsEmail'. From the action->configuration[emailConfig/smsConfig][hoofdObjectSource/resourceUrlSource].
+     * @param string $type One of: hoofdObject or resourceUrl.
+     *
+     * @return array|null The object from the source. Or null.
+     */
+    private function eventAddSourceData(string $sourceRef, string $type): ?array
+    {
+        if ($sourceRef === 'sameAsEmail'
+            && empty($this->configuration['emailConfig'][$type]['SMSSameAsEmail']) === false
+        ) {
+            return $this->configuration['emailConfig'][$type]['SMSSameAsEmail'];
+        }
+        
+        if ($sourceRef !== 'sameAsEmail') {
+            $config = [
+                'source' => $sourceRef,
+                'notificationProperty' => "body.$type"
+            ];
+            $object = $this->callSource($config, ['emailConfig or smsConfig', "while trying to get $type object for email and/or sms"]);
+            
+            $this->configuration['emailConfig'][$type]['SMSSameAsEmail'] = $object;
+            
+            return $object;
+        }
+        
+        return null;
+    }
+    
 
     /**
      * Does a $this->callService->call() on a $config['source'], using $this->data[$config['notificationProperty']] as sourceEndpoint.
      *
      * @param array  $config  A config array containing the 'source' = reference to a source & 'notificationProperty' or 'sourceEndpoint' = a property in the notification body where to find an url, 'notificationProperty' or just the 'sourceEndpoint'.
-     * @param string $message A message to add to any error logs created.
+     * @param array $messages Messages to add to any error logs created. [0] will specifically be passed to validateConfigArray() function. [1] will be used for all logs created in this function.
      *
      * @return array|null The decoded response from the call.
      */
-    private function callSource(array $config, string $message): ?array
+    private function callSource(array $config, array $messages): ?array
     {
-        if ($this->validateConfigArray(['source', 'sourceEndpoint|or|notificationProperty'], "getObjectDataConfig (parent or sub'getObjectDataConfig' array) ($message)", $config,) === false) {
+        if ($this->validateConfigArray(['source', 'sourceEndpoint|or|notificationProperty'], "$messages[0] ($messages[1])", $config,) === false) {
             return null;
         }
         
-        $source = $this->resourceService->getSource($config['source'], 'open-catalogi/open-catalogi-bundle');
+        $source = $this->resourceService->getSource($config['source'], 'common-gateway/customer-notifications-bundle');
         if ($source === null) {
             return null;
         }
@@ -469,7 +536,7 @@ class NotificationsService
             $response        = $this->callService->call($source, $endpoint, 'GET', $callConfig);
             $decodedResponse = $this->callService->decodeResponse($source, $response);
         } catch (Exception $e) {
-            $this->logger->error("Error when trying to call Source {$config['source']} $message: {$e->getMessage()}", ['plugin' => 'common-gateway/customer-notifications-bundle']);
+            $this->logger->error("Error when trying to call Source {$config['source']} $messages[1]: {$e->getMessage()}", ['plugin' => 'common-gateway/customer-notifications-bundle']);
             return null;
         }
 
@@ -536,32 +603,6 @@ class NotificationsService
 
 
     /**
-     * Throws a Gateway event, used for throwing the email and/or SMS event.
-     * Passes the $object array with the thrown event.
-     *
-     * @param array      $config The EmailConfig or SMSConfig.
-     * @param array|null $object The object found or null.
-     *
-     * @return array Return data from the thrown event.
-     */
-    private function throwEvent(array $config, ?array $object): array
-    {
-        $eventData['notification']['body'] = $this->data['body'];
-        
-        if (empty($object) === false) {
-            $eventData['object'] = $object;
-        }
-        
-        $event = new ActionEvent('commongateway.action.event', $eventData, $config['throw']);
-
-        $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
-
-        return $event->getData();
-
-    }//end throwEvent()
-
-
-    /**
      * If createObjectConfig has been configured in the Action->configuration.
      * This function will create an ObjectEntity using data from notification or other configured objects.
      *
@@ -575,7 +616,7 @@ class NotificationsService
 
         $createObjectConfig = $this->configuration['createObjectConfig'];
 
-        $schema = $this->resourceService->getSchema($createObjectConfig['schema'], 'open-catalogi/open-catalogi-bundle');
+        $schema = $this->resourceService->getSchema($createObjectConfig['schema'], 'common-gateway/customer-notifications-bundle');
         if ($schema === null) {
             return null;
         }

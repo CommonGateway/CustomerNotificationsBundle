@@ -58,10 +58,12 @@
                     "externeIdentificaties.partijIdentificator.objecttype": "ingeschrevenpersoon"
                 }
             },
+            "hoofdObjectSource": "https://buren.nl/source/buren.zrc.source.json",
             "throw": "notifications.zaak.created.email"
         },
         "smsConfig": {
             "getObjectDataConfig": "sameAsEmail",
+            "hoofdObjectSource": "sameAsEmail",
             "throw": "notifications.zaak.created.sms"
         },
         "createObjectConfig": {
