@@ -16,13 +16,14 @@
         "variables": {
             "subject": "hoofdObject.identificatie",
             "name": "object.persoon.contactnaam",
+            "email": "embedded.voorkeurskanaal.adres",
             "omschrijving": "hoofdObject.omschrijving",
             "header": "",
             "body": "Uw {{omschrijving}} zaak met identificatie {{subject}} is afgerond.",
             "footer": ""
         },
         "sender": "no-reply@conduction.nl",
-        "receiver": "wilco@conduction.nl",
+        "receiver": "{{email}}",
         "subject": "Zaak afgerond: {{subject}}",
         "replyTo": "info@conduction.nl"
     }

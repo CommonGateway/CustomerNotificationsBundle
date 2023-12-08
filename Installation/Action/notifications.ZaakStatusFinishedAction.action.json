@@ -75,14 +75,14 @@
                 }
             },
             "objectConditions": {
-                "voorkeurskanaal.soortDigitaalAdres": "emailadres"
+                "embedded.voorkeurskanaal.soortDigitaalAdres": "emailadres"
             },
             "throw": "notifications.zaak.status.finished.email"
         },
         "smsConfig": {
             "getObjectDataConfig": "sameAsEmail",
             "objectConditions": {
-                "voorkeurskanaal.soortDigitaalAdres": "telefoonnummer"
+                "embedded.voorkeurskanaal.soortDigitaalAdres": "telefoonnummer"
             },
             "throw": "notifications.zaak.status.finished.sms"
         },

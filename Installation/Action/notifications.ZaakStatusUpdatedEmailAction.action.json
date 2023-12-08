@@ -16,13 +16,14 @@
         "variables": {
             "subject": "hoofdObject.identificatie",
             "name": "object.persoon.contactnaam",
+            "email": "embedded.voorkeurskanaal.adres",
             "omschrijving": "hoofdObject.omschrijving",
             "header": "",
             "body": "De status van uw {{omschrijving}} zaak met identificatie {{subject}} is gewijzigd.",
             "footer": ""
         },
         "sender": "no-reply@conduction.nl",
-        "receiver": "wilco@conduction.nl",
+        "receiver": "{{email}}",
         "subject": "Zaak status gewijzigd: {{subject}}",
         "replyTo": "info@conduction.nl"
     }
