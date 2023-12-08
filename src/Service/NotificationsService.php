@@ -150,8 +150,8 @@ class NotificationsService
         if (empty($email) === false) {
             $message = $message.", email send";
             
-            $object = $this->handleObjectsCreation();
-            if (empty($object) === false) {
+            $objects = $this->handleObjectsCreation();
+            if (empty($objects) === false) {
                 $message = $message." & object created";
             }
         }
@@ -160,8 +160,8 @@ class NotificationsService
         if (empty($sms) === false) {
             $message = $message.", sms send";
             
-            $object = $this->handleObjectsCreation();
-            if (empty($object) === false) {
+            $objects = $this->handleObjectsCreation();
+            if (empty($objects) === false) {
                 $message = $message." & object created";
             }
         }
@@ -296,7 +296,7 @@ class NotificationsService
             $objectDot = new Dot($object);
             foreach ($smsConfig['objectConditions'] as $key => $condition) {
                 if ($objectDot->has($key) === false || $objectDot->get($key) != $condition) {
-                    $this->logger->info("Action configuration emailConfig objectConditions are not met, we don't need to send an email.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
+                    $this->logger->info("Action configuration smsConfig objectConditions are not met, we don't need to send an sms.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
                     return null;
                 }
             }
