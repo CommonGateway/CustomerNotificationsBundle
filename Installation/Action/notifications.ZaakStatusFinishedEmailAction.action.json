@@ -16,7 +16,7 @@
         "variables": {
             "subject": "hoofdObject.identificatie",
             "name": "object.persoon.contactnaam",
-            "email": "embedded.voorkeurskanaal.adres",
+            "email": "object.embedded.voorkeurskanaal.adres",
             "omschrijving": "hoofdObject.omschrijving",
             "header": "",
             "body": "Uw {{omschrijving}} zaak met identificatie {{subject}} is afgerond.",

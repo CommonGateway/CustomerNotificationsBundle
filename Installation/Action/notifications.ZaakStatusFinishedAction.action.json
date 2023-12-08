@@ -87,7 +87,7 @@
             "throw": "notifications.zaak.status.finished.sms"
         },
         "createObjectConfig": {
-            "schema": "Entity ref or uuid",
+            "schema": "https://commongateway.nl/klant.klantcontact.schema.json",
             "mapping": "Mapping ref or uuid"
         }
     }

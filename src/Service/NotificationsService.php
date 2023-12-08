@@ -149,16 +149,21 @@ class NotificationsService
         $email = $this->handleEmail();
         if (empty($email) === false) {
             $message = $message.", email send";
+            
+            $object = $this->handleObjectsCreation();
+            if (empty($object) === false) {
+                $message = $message." & object created";
+            }
         }
 
         $sms = $this->handleSMS();
         if (empty($sms) === false) {
             $message = $message.", sms send";
-        }
-
-        $object = $this->handleObject();
-        if (empty($object) === false) {
-            $message = $message.", object created";
+            
+            $object = $this->handleObjectsCreation();
+            if (empty($object) === false) {
+                $message = $message." & object created";
+            }
         }
 
         $response         = ['Message' => $message.'.'];
@@ -626,7 +631,7 @@ class NotificationsService
      *
      * @return array|null The Created Object. Or null.
      */
-    private function handleObject(): ?array
+    private function handleObjectsCreation(): ?array
     {
         if (empty($this->configuration['createObjectConfig']) === true) {
             return null;

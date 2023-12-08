@@ -93,7 +93,7 @@ class EmailService
             if ((str_contains($variable, '{%') === true && str_contains($variable, '%}') === true)
                 || (str_contains($variable, '{{') === true && str_contains($variable, '}}') === true)
             ) {
-                $variable[$key] = $this->twig->createTemplate($variable)->render($variables);
+                $variables[$key] = $this->twig->createTemplate($variable)->render($variables);
             }
         }
 
