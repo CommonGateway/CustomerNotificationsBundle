@@ -58,6 +58,7 @@
                 "isEindstatus": true
             }
         },
+        "hoofdObjectSource": "https://buren.nl/source/buren.zrc.source.json",
         "emailConfig": {
             "getObjectDataConfig": {
                 "source": "https://buren.nl/source/buren.zrc.source.json",
@@ -73,12 +74,10 @@
                     "externeIdentificaties.partijIdentificator.objecttype": "ingeschrevenpersoon"
                 }
             },
-            "hoofdObjectSource": "https://buren.nl/source/buren.zrc.source.json",
             "throw": "notifications.zaak.status.finished.email"
         },
         "smsConfig": {
             "getObjectDataConfig": "sameAsEmail",
-            "hoofdObjectSource": "sameAsEmail",
             "throw": "notifications.zaak.status.finished.sms"
         },
         "createObjectConfig": {

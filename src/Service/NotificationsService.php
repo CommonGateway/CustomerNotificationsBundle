@@ -446,12 +446,12 @@ class NotificationsService
             $eventData['object'] = $object;
         }
         
-        if (empty($config['hoofdObjectSource']) === false) {
-            $eventData['hoofdObject'] = $this->eventAddSourceData($config['hoofdObjectSource'], 'hoofdObject');
+        if (empty($this->configuration['hoofdObjectSource']) === false) {
+            $eventData['hoofdObject'] = $this->eventAddSourceData($this->configuration['hoofdObjectSource'], 'hoofdObject');
         }
         
-        if (empty($config['resourceUrlSource']) === false) {
-            $eventData['resourceUrl'] = $this->eventAddSourceData($config['resourceUrlSource'], 'resourceUrl');
+        if (empty($this->configuration['resourceUrlSource']) === false) {
+            $eventData['resourceUrl'] = $this->eventAddSourceData($this->configuration['resourceUrlSource'], 'resourceUrl');
         }
         
         $event = new ActionEvent('commongateway.action.event', $eventData, $config['throw']);
@@ -474,28 +474,19 @@ class NotificationsService
      */
     private function eventAddSourceData(string $sourceRef, string $type): ?array
     {
-        if ($sourceRef === 'sameAsEmail') {
-            if (empty($this->configuration['emailConfig'][$type.'Source']['SMSSameAsEmail']) === false) {
-                return $this->configuration['emailConfig'][$type.'Source']['SMSSameAsEmail'];
-            }
-            if (empty($this->configuration['emailConfig'][$type.'Source']['SMSSameAsEmail']) === false) {
-                $sourceRef = $this->configuration['emailConfig'][$type.'Source'];
-            }
+        if (empty($this->configuration['emailConfig'][$type.'Source']['SMSSameAsEmail']) === false) {
+            return $this->configuration['emailConfig'][$type.'Source']['SMSSameAsEmail'];
         }
         
-        if ($sourceRef !== 'sameAsEmail') {
-            $config = [
-                'source' => $sourceRef,
-                'notificationProperty' => "body.$type"
-            ];
-            $object = $this->callSource($config, ['emailConfig or smsConfig', "while trying to get $type object for email and/or sms"]);
-            
-            $this->configuration['emailConfig'][$type]['SMSSameAsEmail'] = $object;
-            
-            return $object;
-        }
+        $config = [
+            'source' => $sourceRef,
+            'notificationProperty' => "body.$type"
+        ];
+        $object = $this->callSource($config, ['emailConfig or smsConfig', "while trying to get $type object for email and/or sms"]);
         
-        return null;
+        $this->configuration['emailConfig'][$type.'Source']['SMSSameAsEmail'] = $object;
+        
+        return $object;
     }
     
 
