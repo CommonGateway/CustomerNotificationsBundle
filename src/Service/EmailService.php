@@ -89,7 +89,7 @@ class EmailService
                 $variables[$key] = $dataDot->get($variable);
                 continue;
             }
-            
+
             if ((str_contains($variable, '{%') === true && str_contains($variable, '%}') === true)
                 || (str_contains($variable, '{{') === true && str_contains($variable, '}}') === true)
             ) {
