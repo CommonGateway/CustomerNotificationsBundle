@@ -57,7 +57,7 @@ class SmsService
 
         return $data;
 
-    }//end EmailHandler()
+    }//end SmsHandler()
 
 
     /**
@@ -125,7 +125,7 @@ class SmsService
 
         return true;
 
-    }//end sendEmail()
+    }//end sendSms()
 
 
 }//end class

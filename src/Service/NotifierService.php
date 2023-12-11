@@ -56,7 +56,7 @@ class NotifierService
 
         return $data;
 
-    }//end EmailHandler()
+    }//end NotifyHandler()
 
 
     /**
@@ -149,7 +149,7 @@ class NotifierService
 
         return true;
 
-    }//end sendEmail()
+    }//end sendNotification()
 
 
 }//end class
