@@ -58,6 +58,7 @@
                 "isEindstatus": false
             }
         },
+        "hoofdObjectSource": "https://buren.nl/source/buren.zrc.source.json",
         "emailConfig": {
             "getObjectDataConfig": {
                 "source": "https://buren.nl/source/buren.zrc.source.json",
@@ -73,14 +74,20 @@
                     "externeIdentificaties.partijIdentificator.objecttype": "ingeschrevenpersoon"
                 }
             },
-            "throw": "throwForEmailAction"
+            "objectConditions": {
+                "embedded.voorkeurskanaal.soortDigitaalAdres": "emailadres"
+            },
+            "throw": "notifications.zaak.status.updated.email"
         },
         "smsConfig": {
             "getObjectDataConfig": "sameAsEmail",
-            "throw": "throwForSMSAction"
+            "objectConditions": {
+                "embedded.voorkeurskanaal.soortDigitaalAdres": "telefoonnummer"
+            },
+            "throw": "notifications.zaak.status.updated.sms"
         },
         "createObjectConfig": {
-            "schema": "Entity ref or uuid",
+            "schema": "https://commongateway.nl/klant.klantcontact.schema.json",
             "mapping": "Mapping ref or uuid"
         }
     }
