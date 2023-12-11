@@ -152,7 +152,7 @@ class NotificationsService
             
             $objects = $this->handleObjectsCreation();
             if (empty($objects) === false) {
-                $message = $message." & object created";
+                $message = $message." & object(s) created";
             }
         }
 
@@ -162,7 +162,7 @@ class NotificationsService
             
             $objects = $this->handleObjectsCreation();
             if (empty($objects) === false) {
-                $message = $message." & object created";
+                $message = $message." & object(s) created";
             }
         }
 
