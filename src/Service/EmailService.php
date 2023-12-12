@@ -56,7 +56,7 @@ class EmailService
         Environment $twig,
         LoggerInterface $pluginLogger
     ) {
-        $this->twig = $twig;
+        $this->twig   = $twig;
         $this->logger = $pluginLogger;
 
     }//end __construct()
