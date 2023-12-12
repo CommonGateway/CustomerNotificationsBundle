@@ -1,0 +1,28 @@
+{
+    "title": "ZaakCreatedSmsAction",
+    "$id": "https://commongateway.nl/action/notifications.ZaakCreatedSmsAction.action.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
+    "version": "0.0.1",
+    "listens": ["notifications.zaak.created.sms"],
+    "conditions":
+    {
+        "==": [1, 1]
+    },
+    "class": "CommonGateway\\CustomerNotificationsBundle\\ActionHandler\\SmsHandler",
+    "configuration":
+    {
+        "serviceDNS": "",
+        "template": "eyUgaWYgYm9keXxkZWZhdWx0ICV9e3sgYm9keSB8IG5sMmJyIH19eyUgZW5kaWYgJX0K",
+        "variables": {
+            "subject": "hoofdObject.identificatie",
+            "name": "object.persoon.contactnaam",
+            "email": "object.embedded.voorkeurskanaal.adres",
+            "omschrijving": "hoofdObject.omschrijving",
+            "header": "",
+            "body": "Er is een {{omschrijving}} zaak met identificatie {{subject}} voor u aangemaakt.",
+            "footer": ""
+        },
+        "sender": "Gemeente",
+        "receiver": "{{telefoonnummer}}"
+    }
+}

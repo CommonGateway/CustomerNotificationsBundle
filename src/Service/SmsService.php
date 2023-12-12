@@ -4,23 +4,26 @@ namespace CommonGateway\CustomerNotificationsBundle\Service;
 
 use Adbar\Dot;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\Mailer;
-use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Notifier;
+use Symfony\Component\Notifier\Texter;
+use Symfony\Component\Notifier\Transport;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
 /**
- * @Author Wilco Louwerse <wilco@conduction.nl>, Ruben van der Linde <ruben@conduction.nl>, Sarai Misidjan <sarai@conduction.nl>
+ * Triggers sending a SMS via the Symfony Notifier.
+ *
+ * @Author Robert Zondervan <robert@conduction.nl>, Wilco Louwerse <wilco@conduction.nl>, Ruben van der Linde <ruben@conduction.nl>, Sarai Misidjan <sarai@conduction.nl>
  *
  * @license EUPL <https://github.com/ConductionNL/contactcatalogus/blob/master/LICENSE.md>
  *
  * @category Service
  */
-class EmailService
+class SmsService
 {
 
     /**
@@ -63,7 +66,7 @@ class EmailService
 
 
     /**
-     * Handles the sending of an email based on an event.
+     * Handles the sending of an sms based on an event.
      *
      * @param array $data
      * @param array $configuration
@@ -72,20 +75,20 @@ class EmailService
      *
      * @return array
      */
-    public function EmailHandler(array $data, array $configuration): array
+    public function SmsHandler(array $data, array $configuration): array
     {
         $this->data          = $data;
         $this->configuration = $configuration;
 
-        $this->sendEmail();
+        $this->sendSms();
 
         return $data;
 
-    }//end EmailHandler()
+    }//end SmsHandler()
 
 
     /**
-     * Sends and email using an EmailTemplate with configuration for it. It is possible to use $object data in the email if configured right.
+     * Sends and sms using an EmailTemplate with configuration for it. It is possible to use $object data in the sms if configured right.
      *
      * @throws LoaderError
      * @throws SyntaxError
@@ -93,18 +96,14 @@ class EmailService
      *
      * @return bool
      */
-    private function sendEmail(): bool
+    private function sendSms(): bool
     {
-        // Create mailer with mailgun url
-        $transport = Transport::fromDsn($this->configuration['serviceDNS']);
-        $mailer    = new Mailer($transport);
-
-        // Ready the email template with configured variables
+        // Ready the sms template with configured variables
         $variables = [];
 
         $dataDot = new Dot($this->data);
         foreach ($this->configuration['variables'] as $key => $variable) {
-            // Response is the default used for creating emails after an /api endpoint has been called and returned a response.
+            // Response is the default used for creating smss after an /api endpoint has been called and returned a response.
             if ($dataDot->has('response'.$variable) === true) {
                 $variables[$key] = $dataDot->get('response'.$variable);
                 continue;
@@ -127,55 +126,33 @@ class EmailService
         $text = strip_tags(preg_replace('#<br\s*/?>#i', "\n", $html), '\n');
 
         // Lets allow the use of values from the object Created/Updated with {attributeName.attributeName} in the these^ strings.
-        $subject  = $this->twig->createTemplate($this->configuration['subject'])->render($variables);
         $receiver = $this->twig->createTemplate($this->configuration['receiver'])->render($variables);
         $sender   = $this->twig->createTemplate($this->configuration['sender'])->render($variables);
 
-        // If we have no sender, set sender to receiver
+        // If we have no sender, do not send the SMS
         if (!$sender) {
-            $this->logger->error('No sender set, set receiver also as sender', ['plugin' => 'common-gateway/customer-notifications-bundle']);
-            $sender = $receiver;
+            $this->logger->error('No sender set, could not send SMS', ['plugin' => 'common-gateway/customer-notifications-bundle']);
+            return false;
         }
 
-        // Create the email
-        $email = (new Email())
-            ->from($sender)
-            ->to($receiver)
-            // ->cc('cc@example.com')
-            // ->bcc('bcc@example.com')
-            // ->replyTo('fabien@example.com')
-            // ->priority(Email::PRIORITY_HIGH)
-            ->subject($subject)
-            ->html($html)
-            ->text($text);
+        // Create texter with service DSN
+        $transport = Transport::fromDsn($this->configuration['serviceDNS'].'?from='.$sender);
+        $texter    = new Texter($transport);
 
-        // Then we can handle some optional configuration
-        if (empty($this->configuration['cc']) === false) {
-            $email->cc($this->configuration['cc']);
-        }
+        $sms = new SmsMessage(
+            $receiver,
+            $text
+        );
 
-        if (empty($this->configuration['bcc']) === false) {
-            $email->bcc($this->configuration['bcc']);
-        }
-
-        if (empty($this->configuration['replyTo']) === false) {
-            $email->replyTo($this->configuration['replyTo']);
-        }
-
-        if (empty($this->configuration['priority']) === false) {
-            $email->priority($this->configuration['priority']);
-        }
-
-        // todo: attachments
-        // Send the email
+        // Send the sms
         /*
-         * @var Symfony\Component\Mailer\SentMessage $sentEmail
+         * @var Symfony\Component\Notifier\SentMessage $sentSms
          */
-        $mailer->send($email);
+        $texter->send($sms);
 
         return true;
 
-    }//end sendEmail()
+    }//end sendSms()
 
 
 }//end class
