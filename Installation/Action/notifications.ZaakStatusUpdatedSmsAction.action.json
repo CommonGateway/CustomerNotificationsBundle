@@ -1,0 +1,28 @@
+{
+    "title": "ZaakStatusUpdatedSmsAction",
+    "$id": "https://commongateway.nl/action/notifications.ZaakStatusUpdatedSmsAction.action.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
+    "version": "0.0.1",
+    "listens": ["notifications.zaak.status.updated.sms"],
+    "conditions":
+    {
+        "==": [1, 1]
+    },
+    "class": "CommonGateway\\CustomerNotificationsBundle\\ActionHandler\\SmsHandler",
+    "configuration":
+    {
+        "serviceDNS": "",
+        "template": "eyUgaWYgYm9keXxkZWZhdWx0ICV9e3sgYm9keSB8IG5sMmJyIH19eyUgZW5kaWYgJX0K",
+        "variables": {
+            "subject": "hoofdObject.identificatie",
+            "name": "object.persoon.contactnaam",
+            "email": "object.embedded.voorkeurskanaal.adres",
+            "omschrijving": "hoofdObject.omschrijving",
+            "header": "",
+            "body": "De status van uw {{omschrijving}} zaak met identificatie {{subject}} is gewijzigd.",
+            "footer": ""
+        },
+        "sender": "Gemeente",
+        "receiver": "{{telefoonnummer}}"
+    }
+}
