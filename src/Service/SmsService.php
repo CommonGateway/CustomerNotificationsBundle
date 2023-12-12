@@ -66,7 +66,7 @@ class SmsService
 
 
     /**
-     * Handles the sending of an email based on an event.
+     * Handles the sending of an sms based on an event.
      *
      * @param array $data
      * @param array $configuration
@@ -88,7 +88,7 @@ class SmsService
 
 
     /**
-     * Sends and email using an EmailTemplate with configuration for it. It is possible to use $object data in the email if configured right.
+     * Sends and sms using an EmailTemplate with configuration for it. It is possible to use $object data in the sms if configured right.
      *
      * @throws LoaderError
      * @throws SyntaxError
@@ -103,7 +103,7 @@ class SmsService
 
         $dataDot = new Dot($this->data);
         foreach ($this->configuration['variables'] as $key => $variable) {
-            // Response is the default used for creating emails after an /api endpoint has been called and returned a response.
+            // Response is the default used for creating smss after an /api endpoint has been called and returned a response.
             if ($dataDot->has('response'.$variable) === true) {
                 $variables[$key] = $dataDot->get('response'.$variable);
                 continue;
@@ -145,7 +145,7 @@ class SmsService
             $text
         );
 
-        // Send the email
+        // Send the sms
         /*
          * @var Symfony\Component\Mailer\SentMessage $sentEmail
          */
