@@ -135,11 +135,10 @@ class SmsService
             $this->logger->error('No sender set, could not send SMS', ['plugin' => 'common-gateway/customer-notifications-bundle']);
             return false;
         }
-        
+
         // Create texter with service DSN
         $transport = Transport::fromDsn($this->configuration['serviceDNS'].'?from='.$sender);
         $texter    = new Texter($transport);
-
 
         $sms = new SmsMessage(
             $receiver,
