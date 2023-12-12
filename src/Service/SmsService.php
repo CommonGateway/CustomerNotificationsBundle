@@ -146,7 +146,7 @@ class SmsService
 
         // Send the sms
         /*
-         * @var Symfony\Component\Mailer\SentMessage $sentEmail
+         * @var Symfony\Component\Notifier\SentMessage $sentSms
          */
         $texter->send($sms);
 

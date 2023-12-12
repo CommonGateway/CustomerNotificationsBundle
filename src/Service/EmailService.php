@@ -3,6 +3,7 @@
 namespace CommonGateway\CustomerNotificationsBundle\Service;
 
 use Adbar\Dot;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport;
@@ -22,17 +23,41 @@ use Twig\Error\SyntaxError;
 class EmailService
 {
 
+    /**
+     * The twig environment
+     *
+     * @var Environment
+     */
     private Environment $twig;
 
+    /**
+     * The action data.
+     *
+     * @var array
+     */
     private array $data;
 
+    /**
+     * The action configuration.
+     *
+     * @var array
+     */
     private array $configuration;
+
+    /**
+     * The plugin logger.
+     *
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
 
 
     public function __construct(
-        Environment $twig
+        Environment $twig,
+        LoggerInterface $pluginLogger
     ) {
         $this->twig = $twig;
+        $this->logger = $pluginLogger;
 
     }//end __construct()
 
@@ -108,6 +133,7 @@ class EmailService
 
         // If we have no sender, set sender to receiver
         if (!$sender) {
+            $this->logger->error('No sender set, set receiver also as sender', ['plugin' => 'common-gateway/customer-notifications-bundle']);
             $sender = $receiver;
         }
 
