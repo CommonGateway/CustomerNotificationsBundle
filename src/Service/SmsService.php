@@ -3,6 +3,7 @@
 namespace CommonGateway\CustomerNotificationsBundle\Service;
 
 use Adbar\Dot;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Notifier;
@@ -14,7 +15,9 @@ use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
 /**
- * @Author Wilco Louwerse <wilco@conduction.nl>, Ruben van der Linde <ruben@conduction.nl>, Sarai Misidjan <sarai@conduction.nl>
+ * Triggers sending a SMS via the Symfony Notifier.
+ *
+ * @Author Robert Zondervan <robert@conduction.nl>, Wilco Louwerse <wilco@conduction.nl>, Ruben van der Linde <ruben@conduction.nl>, Sarai Misidjan <sarai@conduction.nl>
  *
  * @license EUPL <https://github.com/ConductionNL/contactcatalogus/blob/master/LICENSE.md>
  *
@@ -23,17 +26,41 @@ use Twig\Error\SyntaxError;
 class SmsService
 {
 
+    /**
+     * The twig environment
+     *
+     * @var Environment
+     */
     private Environment $twig;
 
+    /**
+     * The action data.
+     *
+     * @var array
+     */
     private array $data;
 
+    /**
+     * The action configuration.
+     *
+     * @var array
+     */
     private array $configuration;
+
+    /**
+     * The plugin logger.
+     *
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
 
 
     public function __construct(
-        Environment $twig
+        Environment $twig,
+        LoggerInterface $pluginLogger
     ) {
-        $this->twig = $twig;
+        $this->twig   = $twig;
+        $this->logger = $pluginLogger;
 
     }//end __construct()
 
@@ -71,7 +98,7 @@ class SmsService
      */
     private function sendSms(): bool
     {
-        // Ready the email template with configured variables
+        // Ready the sms template with configured variables
         $variables = [];
 
         $dataDot = new Dot($this->data);
@@ -103,14 +130,16 @@ class SmsService
         $receiver = $this->twig->createTemplate($this->configuration['receiver'])->render($variables);
         $sender   = $this->twig->createTemplate($this->configuration['sender'])->render($variables);
 
-        // Create mailer with mailgun url
+        // If we have no sender, do not send the SMS
+        if (!$sender) {
+            $this->logger->error('No sender set, could not send SMS', ['plugin' => 'common-gateway/customer-notifications-bundle']);
+            return false;
+        }
+        
+        // Create texter with service DSN
         $transport = Transport::fromDsn($this->configuration['serviceDNS'].'?from='.$sender);
         $texter    = new Texter($transport);
 
-        // If we have no sender, set sender to receiver
-        if (!$sender) {
-            $sender = $receiver;
-        }
 
         $sms = new SmsMessage(
             $receiver,

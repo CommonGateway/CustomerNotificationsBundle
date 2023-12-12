@@ -24,7 +24,6 @@
         },
         "sender": "Gemeente",
         "receiver": "{{telefoonnummer}}",
-        "subject": "Zaak status gewijzigd: {{subject}}",
-        "replyTo": "info@conduction.nl"
+        "subject": "Zaak status gewijzigd: {{subject}}"
     }
 }

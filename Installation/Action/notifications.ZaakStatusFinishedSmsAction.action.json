@@ -1,6 +1,6 @@
 {
-    "title": "ZaakCreatedEmailAction",
-    "$id": "https://commongateway.nl/action/notifications.ZaakStatusFinishedEmailAction.action.json",
+    "title": "ZaakCreatedSmsAction",
+    "$id": "https://commongateway.nl/action/notifications.ZaakStatusFinishedSmsAction.action.json",
     "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
     "version": "0.0.1",
     "listens": ["notifications.zaak.status.finished.sms"],
@@ -8,7 +8,7 @@
     {
         "==": [1, 1]
     },
-    "class": "CommonGateway\\CustomerNotificationsBundle\\ActionHandler\\EmailHandler",
+    "class": "CommonGateway\\CustomerNotificationsBundle\\ActionHandler\\SmsHandler",
     "configuration":
     {
         "serviceDNS": "",
