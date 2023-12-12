@@ -1,5 +1,5 @@
 {
-    "title": "ZaakCreatedEmailAction",
+    "title": "ZaakStatusFinishedEmailAction",
     "$id": "https://commongateway.nl/action/notifications.ZaakStatusFinishedEmailAction.action.json",
     "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
     "version": "0.0.1",
