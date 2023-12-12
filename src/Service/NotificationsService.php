@@ -138,8 +138,7 @@ class NotificationsService
         
         $extraConditions = $this->handleExtraConditions();
         if ($extraConditions !== []) {
-            $response         = ['Message' => "Failed to match the following extraConditions", "ExtraConditions" => $extraConditions];
-            $data['response'] = new Response(\Safe\json_encode($response), 200, ['Content-type' => 'application/json']);
+            $this->logger->info("Failed to match the following extraConditions for current action", ['plugin' => 'common-gateway/customer-notifications-bundle', 'ExtraConditions' => $extraConditions]);
             
             return $data;
         }

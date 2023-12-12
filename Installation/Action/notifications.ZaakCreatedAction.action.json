@@ -56,7 +56,7 @@
                 "searchSchemas": ["https://commongateway.nl/klant.partij.schema.json"],
                 "searchQuery": {
                     "externeIdentificaties.partijIdentificator.objectId": "{{results.0.betrokkeneIdentificatie.inpBsn}}",
-                    "externeIdentificaties.partijIdentificator.objecttype": "ingeschrevenpersoon"
+                    "externeIdentificaties.partijIdentificator.objecttype": "ingeschrevenpersonen"
                 }
             },
             "objectConditions": {
