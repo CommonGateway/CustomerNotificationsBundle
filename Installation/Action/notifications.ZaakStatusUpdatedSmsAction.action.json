@@ -23,7 +23,6 @@
             "footer": ""
         },
         "sender": "Gemeente",
-        "receiver": "{{telefoonnummer}}",
-        "subject": "Zaak status gewijzigd: {{subject}}"
+        "receiver": "{{telefoonnummer}}"
     }
 }

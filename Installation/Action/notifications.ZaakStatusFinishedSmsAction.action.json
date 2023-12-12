@@ -23,8 +23,6 @@
             "footer": ""
         },
         "sender": "Gemeente",
-        "receiver": "{{telefoonnummer}}",
-        "subject": "Zaak afgerond: {{subject}}",
-        "replyTo": "info@conduction.nl"
+        "receiver": "{{telefoonnummer}}"
     }
 }
