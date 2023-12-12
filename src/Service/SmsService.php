@@ -126,7 +126,6 @@ class SmsService
         $text = strip_tags(preg_replace('#<br\s*/?>#i', "\n", $html), '\n');
 
         // Lets allow the use of values from the object Created/Updated with {attributeName.attributeName} in the these^ strings.
-        $subject  = $this->twig->createTemplate($this->configuration['subject'])->render($variables);
         $receiver = $this->twig->createTemplate($this->configuration['receiver'])->render($variables);
         $sender   = $this->twig->createTemplate($this->configuration['sender'])->render($variables);
 
