@@ -18,9 +18,9 @@ softwareType: softwareAddon
 description:
   en:
     localisedName: null
-    genericName: Symfony bundle for customer notification functionality
+    genericName: Symfony bundle for customer notification functionality.
     shortDescription: CustomerNotificationsBundle
-    longDescription: null
+    longDescription: Symfony bundle for customer notification functionality.
     documentation: null
     apiDocumentation: null
     features: []
@@ -29,9 +29,9 @@ description:
     awards: []
   nl:
     localisedName: null
-    genericName: Symfony bundle voor klanten notificatie functionaliteit
+    genericName: Symfony bundle voor klanten notificatie functionaliteit.
     shortDescription: CustomerNotificationsBundle
-    longDescription: null
+    longDescription: Symfony bundle voor klanten notificatie functionaliteit.
     documentation: null
     apiDocumentation: null
     features: []
