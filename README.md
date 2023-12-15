@@ -29,3 +29,30 @@ The dockerized method in the terminal and root folder:
 > for the installation of schemas
 
 `$docker-compose exec php bin/console commongateway:install common-gateway/customer-notifications-bundle`
+
+## Configuration for emails and/or SMS
+
+...
+
+email action config example \
+For more examples see actions in the /Installation/Action folder that use the ActionHandler `EmailHandler`.
+
+sms action config example \
+For more examples see actions in the /Installation/Action folder that use the ActionHandler `SmsHandler`.
+
+## Configuration for notifications
+
+It is also possible to trigger the email and/or SMS actions you configured through notifications. The CustomerNotificiationsBundle adds a new common-gateway endpoint that can be used to send your [ZGW notifications](https://vng-realisatie.github.io/gemma-zaken/themas/achtergronddocumentatie/notificaties) to: \
+`{{gateway-domain}}/api/notifications`
+
+All notifications send to this endpoint will trigger a [common-gateway event](https://commongateway.github.io/CoreBundle/pages/Features/Events): \
+`notifications.notification.created`
+
+And by creating a common-gateway Action using the `NotificationsHandler` [ActionHandler](https://commongateway.github.io/CoreBundle/pages/Features/Action_handlers) you can configure which notifications should trigger a new [common-gateway event](https://commongateway.github.io/CoreBundle/pages/Features/Events) for sending an email or sms.
+
+### How to create a notification Action
+
+...
+
+notification action config example \
+For more examples see actions in the /Installation/Action folder that use the ActionHandler `NotificationsHandler`.
