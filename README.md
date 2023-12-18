@@ -42,17 +42,29 @@ For more examples see actions in the /Installation/Action folder that use the Ac
 
 ## Configuration for notifications
 
-It is also possible to trigger the email and/or SMS actions you configured through notifications. The CustomerNotificiationsBundle adds a new common-gateway endpoint that can be used to send your [ZGW notifications](https://vng-realisatie.github.io/gemma-zaken/themas/achtergronddocumentatie/notificaties) to: \
+It is also possible to trigger the email and/or SMS actions you configured through notifications. The CustomerNotificiationsBundle adds a new Common Gateway endpoint that can be used to send your [ZGW notifications](https://vng-realisatie.github.io/gemma-zaken/themas/achtergronddocumentatie/notificaties) to: \
 `{{gateway-domain}}/api/notifications`
 
-All notifications send to this endpoint will trigger a [common-gateway event](https://commongateway.github.io/CoreBundle/pages/Features/Events): \
+All notifications send to this endpoint will trigger a [Common Gateway event](https://commongateway.github.io/CoreBundle/pages/Features/Events): \
 `notifications.notification.created`
 
-And by creating a common-gateway Action using the `NotificationsHandler` [ActionHandler](https://commongateway.github.io/CoreBundle/pages/Features/Action_handlers) you can configure which notifications should trigger a new [common-gateway event](https://commongateway.github.io/CoreBundle/pages/Features/Events) for sending an email or sms.
+And by creating a Common Gateway Action using the `NotificationsHandler` [ActionHandler](https://commongateway.github.io/CoreBundle/pages/Features/Action_handlers) you can configure which notifications should trigger a new [Common Gateway event](https://commongateway.github.io/CoreBundle/pages/Features/Events) for sending an email or sms.
 
 ### How to create a notification Action
 
+Normally you can create Actions through the Gateway admin UI, but the notification Action has some complex configuration that can currently not be configured with the Gateway UI.
+Because of this it is recommended to include your Action directly in the installation files of the bundle ([Common Gateway plugin](https://commongateway.github.io/CoreBundle/pages/Features/Plugins)) you are working with or use an API-platform tool like postman to directly POST (, PATCH or UPDATE) your Action in the Common Gateway you are working with.
+
+So now that you now how to create a notification Action, you should also know and understand the requirements of the configuration for a (notification) Action:
+- A `name`, your action is going to need a name.
+- A `reference`, each action needs a unique reference url starting with `https://{your-domain}/action/` and ending with `.action.json`, something like: `"https://commongateway.nl/action/notifications.ZaakCreatedAction.action.json"`
+- Each Action needs to listen to one or more [Common Gateway events](https://commongateway.github.io/CoreBundle/pages/Features/Events) you can add this to the `listens` array of your Action. This will most likely be `["notifications.notification.created"]` if you are working with [ZGW notifications](https://vng-realisatie.github.io/gemma-zaken/themas/achtergronddocumentatie/notificaties).
+- Some `conditions`, these conditions determine when your notification action should be triggered and throw the event that will trigger the action sending an email or sms. Below this summary/list you will find an example.
+- The `class`, this should be `"CommonGateway\\CustomerNotificationsBundle\\ActionHandler\\NotificationsHandler"` for your notification Action.
+- A `configuration` array containing specific configuration for getting and passing information to your email and/or sms actions, probably the most complex thing in this list, so because of that below this summary/list you will find a more details explanation and example. 
+
 ...
+notification action conditions example
 
 notification action config example \
 For more examples see actions in the /Installation/Action folder that use the ActionHandler `NotificationsHandler`.
