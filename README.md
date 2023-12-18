@@ -70,6 +70,7 @@ In order to only send an email or sms for a specific type of notification you ca
 Action conditions use [JsonLogic](https://jsonlogic.com/) to compare the Action data with your conditions.
 
 Here is an example of the conditions for a 'case created' / 'zaak aangemaakt' notification Action:
+
 ```json
 {
     "and": [
@@ -107,8 +108,8 @@ Here is an example of the conditions for a 'case created' / 'zaak aangemaakt' no
 > **Note:**
 > For more examples see all Actions in the root/Installation/Action folder that use the ActionHandler (class) `CommonGateway\CustomerNotificationsBundle\ActionHandler\NotificationsHandler`.
 
-In some cases you want to check a little bit more than is possible with only the Action conditions. 
-Such as getting and checking information from the ZGW notification hoofdObject or resourceUrl objects. 
+In some cases you want to check a little bit more than is possible with only the Action conditions.
+Such as getting and checking information from the ZGW notification hoofdObject or resourceUrl objects.
 To learn more about this please check the Action configuration `extraConditions` [below](#extraconditions).
 
 ### Notification Action configuration
@@ -171,35 +172,38 @@ Here is a very complex and extensive example of the Action configuration for a '
     }
 }
 ```
+
 > **Note:**
 > For more examples see all Actions in the root/Installation/Action folder that use the ActionHandler (class) `CommonGateway\CustomerNotificationsBundle\ActionHandler\NotificationsHandler`.
 
 #### extraConditions
 
-The extra conditions for this action, this makes it possible to check properties from an object in a Source outside the Gateway and use that data as extra conditions for running this action. 
-All conditions in the `"conditions"` array are checked. 
+The extra conditions for this action, this makes it possible to check properties from an object in a Source outside the Gateway and use that data as extra conditions for running this action.
+All conditions in the `"conditions"` array are checked.
 
-Only properties/keys defined in a `sourceProperties` array can be used to check conditions for in the `"conditions"` array. 
+Only properties/keys defined in a `sourceProperties` array can be used to check conditions for in the `"conditions"` array.
 See the example [above](#notification-action-configuration), we check if `isEindstatus = true`, `isEindstatus` is present in a `sourceProperties` array.
 
-With `getObjectDataConfig` you can configure how a source will be called, to get the `sourceProperties` you need for your `"conditions"`. 
-`getObjectDataConfig` can be used recursively, if you do this you will need to add the array property `forParentProperties` containing the `sourceProperties` you would like to use to call another Source with. 
+With `getObjectDataConfig` you can configure how a source will be called, to get the `sourceProperties` you need for your `"conditions"`.
+`getObjectDataConfig` can be used recursively, if you do this you will need to add the array property `forParentProperties` containing the `sourceProperties` you would like to use to call another Source with.
 See the example [above](#notification-action-configuration), `"statustype"` is a property on the source containing an url, it is present in the first `sourceProperties` array and in the `forParentProperties` after that.
 
-`getObjectDataConfig` must always have the properties: 
-- `source` reference of the source to call.
-- `sourceProperties` properties to use from source response. 
-- & one of: 
-  - `notificationProperty` get url from the notification to call on a source.
-  - `sourceEndpoint` define a specific endpoint to call on a source.
-  - `forParentProperties` in case of recursion add the sourceProperty name here, that has an url in the value, so that can be used to call another (or the same) source.
+`getObjectDataConfig` must always have the properties:
 
-But `getObjectDataConfig` can also have the property: 
-- `sourceQuery` query to use to call the source.
+* `source` reference of the source to call.
+* `sourceProperties` properties to use from source response.
+* & one of:
+  * `notificationProperty` get url from the notification to call on a source.
+  * `sourceEndpoint` define a specific endpoint to call on a source.
+  * `forParentProperties` in case of recursion add the sourceProperty name here, that has an url in the value, so that can be used to call another (or the same) source.
+
+But `getObjectDataConfig` can also have the property:
+
+* `sourceQuery` query to use to call the source.
 
 #### hoofdObjectSource
 
-When this property is set the data from the notification hoofdObject will be available to use in your email & sms template. 
+When this property is set the data from the notification hoofdObject will be available to use in your email & sms template.
 The given source (reference) will be called using the notification hoofdObject url and the return value will be passed through the thrown email/sms event. \
 Only set this if you need it.
 
@@ -210,31 +214,32 @@ Only set this if you need it.
 
 #### emailConfig
 
-This contains the configuration for sending an email after the notification has been received. 
-If not present it will not be possible for emails to be sent. 
+This contains the configuration for sending an email after the notification has been received.
+If not present it will not be possible for emails to be sent.
 
-- `getObjectDataConfig` can be used to configure how to find and add the data of one Common Gateway Object to the email Action data (and email message through the email template).
-- `objectConditions` TODO
-- `throw` is the event we should throw to trigger another [EmailHandler action](#configuration-for-emails-andor-sms) that will send the actual email. 
+* `getObjectDataConfig` can be used to configure how to find and add the data of one Common Gateway Object to the email Action data (and email message through the email template).
+* `objectConditions` TODO
+* `throw` is the event we should throw to trigger another [EmailHandler action](#configuration-for-emails-andor-sms) that will send the actual email.
 
-Basic details about how `getObjectDataConfig` works can be found in the description of the [extraConditions](#extraconditions) property, please take a look at that first. 
-Good to know & emailConfig specific properties: 
-- `source` reference of the source to call. 
-- `sourceProperties` this is the array with property names to get from the response of the source. 
-- `searchSchemas` array with Schema references to use when searching an Object in de Gateway. 
-- `searchQuery` query array to use when searching an Object in de Gateway, use {{sourcePropertyName}} here to insert the values got using `sourceProperties`. See example [above](#notification-action-configuration).
+Basic details about how `getObjectDataConfig` works can be found in the description of the [extraConditions](#extraconditions) property, please take a look at that first.
+Good to know & emailConfig specific properties:
 
-> **Note:** 
+* `source` reference of the source to call.
+* `sourceProperties` this is the array with property names to get from the response of the source.
+* `searchSchemas` array with Schema references to use when searching an Object in de Gateway.
+* `searchQuery` query array to use when searching an Object in de Gateway, use {{sourcePropertyName}} here to insert the values got using `sourceProperties`. See example [above](#notification-action-configuration).
+
+> **Note:**
 > that it also possible to use `getObjectDataConfig` recursively, see [extraConditions](#extraconditions) for how this is done.
 
 #### smsConfig
 
 This contains the configuration for sending an SMS after the notification has been received.
-If not present it will not be possible for sms to be sent. 
+If not present it will not be possible for sms to be sent.
 
-- `getObjectDataConfig` can be used to configure how to find and add the data of one Common Gateway Object to the SMS Action data (and SMS message through the SMS template), if set to `"sameAsEmail"` the same object (response from sources) as for email will be used (or the same configuration).
-- `objectConditions` TODO
-- `throw` is the event we should throw to trigger another [SMSHandler action](#configuration-for-emails-andor-sms) that will send the actual sms. 
+* `getObjectDataConfig` can be used to configure how to find and add the data of one Common Gateway Object to the SMS Action data (and SMS message through the SMS template), if set to `"sameAsEmail"` the same object (response from sources) as for email will be used (or the same configuration).
+* `objectConditions` TODO
+* `throw` is the event we should throw to trigger another [SMSHandler action](#configuration-for-emails-andor-sms) that will send the actual sms.
 
 For more details about how `getObjectDataConfig` works, please see the [emailConfig property](#emailconfig).
 
@@ -244,4 +249,4 @@ For more details about how `getObjectDataConfig` works, please see the [emailCon
 #### createObjectConfig
 
 This currently doesn't do anything, this is a work in progress. \
-When this is finished it can however be used to create specific Common Gateway Objects at the end of handling a notification. To create for example a 'klantcontact' Object after the email and/or SMS has been sent. 
+When this is finished it can however be used to create specific Common Gateway Objects at the end of handling a notification. To create for example a 'klantcontact' Object after the email and/or SMS has been sent.
