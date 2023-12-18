@@ -42,8 +42,7 @@ For more examples see Actions in the /Installation/Action folder that use the Ac
 
 ## Configuration for notifications
 
-It is also possible to trigger the email and/or SMS Actions you configured through notifications. The CustomerNotificiationsBundle adds a new Common Gateway endpoint that can be used to send your [ZGW notifications](https://vng-realisatie.github.io/gemma-zaken/themas/achtergronddocumentatie/notificaties) to: \
-`{{gateway-domain}}/api/notifications`
+It is also possible to trigger the email and/or SMS Actions you configured through notifications. The CustomerNotificiationsBundle adds a new Common Gateway endpoint that can be used to send your [ZGW notifications](https://vng-realisatie.github.io/gemma-zaken/themas/achtergronddocumentatie/notificaties) to: `{{gateway-domain}}/api/notifications`
 
 All notifications send to this endpoint will trigger a [Common Gateway event](https://commongateway.github.io/CoreBundle/pages/Features/Events): \
 `notifications.notification.created`
@@ -244,7 +243,7 @@ If not present it will not be possible for sms to be sent.
 For more details about how `getObjectDataConfig` works, please see the [emailConfig property](#emailconfig).
 
 > **Note:**
-> smsConfig works exactly the same as the emailConfig except for the use of`"sameAsEmail"`.
+> smsConfig works exactly the same as the emailConfig except for the use of `"sameAsEmail"`.
 
 #### createObjectConfig
 
