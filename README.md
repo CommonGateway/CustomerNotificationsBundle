@@ -59,9 +59,9 @@ So now that you now how to create a notification Action, you should also know an
 * A `name`, your Action is going to need a name.
 * A `reference`, each Action needs a unique reference url starting with `https://{your-domain}/action/` and ending with `.action.json`, something like: `"https://commongateway.nl/action/notifications.ZaakCreatedAction.action.json"`
 * Each Action needs to listen to one or more [Common Gateway events](https://commongateway.github.io/CoreBundle/pages/Features/Events) you can add this to the `listens` array of your Action. This will most likely be `["notifications.notification.created"]` if you are working with [ZGW notifications](https://vng-realisatie.github.io/gemma-zaken/themas/achtergronddocumentatie/notificaties).
-* Some `conditions`, these conditions determine when your notification Action should be triggered and throw the event that will trigger the Action sending an email or sms. [Below](#notification-action-conditions) this summary/list you will find an example.
+* Some `conditions`, these conditions determine when your notification Action should be triggered. And when it triggers it will throw the event that will trigger the Action that sends an email or sms. [Below](#notification-action-conditions) this summary/list you will find an example.
 * The `class`, this should be `"CommonGateway\\CustomerNotificationsBundle\\ActionHandler\\NotificationsHandler"` for your notification Action.
-* A `configuration` array containing specific configuration for getting and passing information to your email and/or sms Actions, probably the most complex thing in this list, so because of that [below](#notification-action-conditions) this summary/list you will find a more detailed explanation and example.
+* A `configuration` array containing specific configuration for getting and passing information to your email and/or sms Actions, probably the most complex thing in this list, so because of that [below](#notification-action-configuration) this summary/list you will find a more detailed explanation and example.
 
 ### Notification Action conditions
 
