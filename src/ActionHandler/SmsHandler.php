@@ -43,30 +43,30 @@ class SmsHandler implements ActionHandlerInterface
             'properties' => [
                 'serviceDNS' => [
                     'type'        => 'string',
-                    'description' => 'The DNS of the sms provider, see https://symfony.com/doc/current/notifier.html#sms-channel for details',
+                    'description' => 'The DNS of the SMS provider, see https://symfony.com/doc/current/notifier.html#sms-channel for details.',
                     'example'     => 'native://default',
                     'required'    => true,
                 ],
                 'template'   => [
                     'type'        => 'string',
-                    'description' => 'The actual sms template, should be a base64 encoded twig template',
+                    'description' => 'The actual SMS template, should be a base64 encoded twig template.',
                     'example'     => 'eyUgaWYgYm9keXxkZWZhdWx0ICV9e3sgYm9keSB8IG5sMmJyIH19eyUgZW5kaWYgJX0K',
                     'required'    => true,
                 ],
                 'variables'  => [
                     'type'        => 'array',
-                    'description' => 'The variables supported by this template (can contain default values)',
+                    'description' => 'The variables supported by this template (can contain default values).',
                     'nullable'    => true,
                 ],
                 'sender'     => [
                     'type'        => 'string',
-                    'description' => 'The sender of the sms',
+                    'description' => 'The sender of the SMS.',
                     'example'     => 'Gemeente%20Mordor',
                     'required'    => true,
                 ],
                 'receiver'   => [
                     'type'        => 'string',
-                    'description' => 'The receiver of the sms',
+                    'description' => 'The receiver of the SMS.',
                     'example'     => '+31612345678',
                     'required'    => true,
                 ],
@@ -77,7 +77,7 @@ class SmsHandler implements ActionHandlerInterface
 
 
     /**
-     * This function runs the sms service plugin.
+     * This function runs the SMS service plugin.
      *
      * @param array $data          The data from the call
      * @param array $configuration The configuration of the action
