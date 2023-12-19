@@ -1,6 +1,6 @@
 # CommonGateway\CustomerNotificationsBundle\Service\NotificationsService  
 
-This service handles the incoming notifications. Creating email and/or sms messages if configured to do so.
+This service handles the incoming notifications. Creating email and/or SMS messages if configured to do so.
 
 
 
@@ -50,7 +50,7 @@ public notificationsHandler (array $data, array $configuration)
 
 Handles incoming notification api-call and is responsible for generating a response. 
 
-Might also send an email and/or sms after, etc. 
+Might also send an email and/or SMS after, etc. 
 
 **Parameters**
 
