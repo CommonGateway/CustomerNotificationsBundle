@@ -52,23 +52,25 @@ So now that you now how to create an email and/or SMS Action, you should also kn
 ### Email and SMS Action configuration
 
 The email and SMS Action configuration are very similar, here is a list of configuration properties that can be used for email and SMS Actions:
-* [**Required**] `serviceDNS` The DNS of the [mail](https://symfony.com/doc/6.2/mailer.html) or [sms](https://symfony.com/doc/current/notifier.html#sms-channel) provider.
-* [**Required**] `template` The template of your email or sms. This should be a base64 encoded [twig template](https://symfony.com/doc/current/templates.html#twig-templating-language). For (not base64 encoded) examples see the [root/src/EmailTemplates folder](https://github.com/CommonGateway/CustomerNotificationsBundle/tree/main/src/EmailTemplates).
-* [**Required**] `sender` The sender. Email for email Action. 'from' string for SMS (example: Gemeente%20Mordor). It is possible to use twig here to add one or multiple variables from the `variables` array.
-* [**Required**] `receiver` The receiver. Email for email Action. Phone number for SMS. It is possible to use twig here to add a variable from the `variables` array.
+
+* \[**Required**] `serviceDNS` The DNS of the [mail](https://symfony.com/doc/6.2/mailer.html) or [sms](https://symfony.com/doc/current/notifier.html#sms-channel) provider.
+* \[**Required**] `template` The template of your email or sms. This should be a base64 encoded [twig template](https://symfony.com/doc/current/templates.html#twig-templating-language). For (not base64 encoded) examples see the [root/src/EmailTemplates folder](https://github.com/CommonGateway/CustomerNotificationsBundle/tree/main/src/EmailTemplates).
+* \[**Required**] `sender` The sender. Email for email Action. 'from' string for SMS (example: Gemeente%20Mordor). It is possible to use twig here to add one or multiple variables from the `variables` array.
+* \[**Required**] `receiver` The receiver. Email for email Action. Phone number for SMS. It is possible to use twig here to add a variable from the `variables` array.
 * `variables` The variables array, with this you can configure which variables (keys of the `variables` array) can be used in your template and fill these values (values of the `variables` array) by using a dot notation reference to a property in the Action data.
 
 > **Note:**
 > For examples of SMS Actions see all Actions in the [root/Installation/Action folder](https://github.com/commonGateway/customernotificationsBundle/tree/main/Installation/Action) that use the ActionHandler (class) `CommonGateway\CustomerNotificationsBundle\ActionHandler\SMSHandler`.
 
 > **Note:**
-> It is possible to use twig to add variables form the `variables` array in another value in the `variables` array, as long as the variables used are defined earlier/higher in the `variables` array. (See variables.body in [this example](https://github.com/CommonGateway/CustomerNotificationsBundle/blob/main/Installation/Action/notifications.ZaakCreatedEmailAction.action.json)). 
+> It is possible to use twig to add variables form the `variables` array in another value in the `variables` array, as long as the variables used are defined earlier/higher in the `variables` array. (See variables.body in [this example](https://github.com/CommonGateway/CustomerNotificationsBundle/blob/main/Installation/Action/notifications.ZaakCreatedEmailAction.action.json)).
 
 #### Email action specific configuration
 
 The email Action configuration has a few more properties you can use than with the SMS Action configuration.
 For all these properties it is possible to use twig to add one or multiple variables from the `variables` array:
-* [**Required**] `subject` The subject of the email.
+
+* \[**Required**] `subject` The subject of the email.
 * `cc` Carbon copy, email boxes that should receive a copy of  this mail.
 * `bcc` Blind carbon copy, people that should receive a copy without other recipient knowing.
 * `replyTo` The address the receiver should reply to, only provide this if it differs from the sender address.
