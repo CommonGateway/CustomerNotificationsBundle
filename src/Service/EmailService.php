@@ -136,7 +136,7 @@ class EmailService
             $this->logger->error('No sender set, set receiver also as sender', ['plugin' => 'common-gateway/customer-notifications-bundle']);
             $sender = $receiver;
         }
-        
+
         // If we have no receiver, set receiver to sender
         if (empty($receiver) === true) {
             $this->logger->error('No receiver set, set sender also as receiver', ['plugin' => 'common-gateway/customer-notifications-bundle']);
