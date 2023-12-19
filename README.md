@@ -288,5 +288,3 @@ For more details about how `getObjectDataConfig` works, please see the [emailCon
 
 This currently doesn't do anything, this is a work in progress. \
 When this is finished it can however be used to create specific Common Gateway Objects at the end of handling a notification. To create for example a 'klantcontact' Object after the email and/or SMS has been sent.
-
-
