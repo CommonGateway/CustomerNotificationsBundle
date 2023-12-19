@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * This service handles the incoming notifications. Creating email and/or sms messages if configured to do so.
+ * This service handles the incoming notifications. Creating email and/or SMS messages if configured to do so.
  *
  * @author Conduction.nl <info@conduction.nl>, Wilco Louwerse <wilco@conduction.nl>
  *
@@ -117,7 +117,7 @@ class NotificationsService
 
     /**
      * Handles incoming notification api-call and is responsible for generating a response.
-     * Might also send an email and/or sms after, etc.
+     * Might also send an email and/or SMS after, etc.
      *
      * @param array $data          The data array
      * @param array $configuration The configuration array
@@ -157,7 +157,7 @@ class NotificationsService
 
         $sms = $this->handleSMS();
         if (empty($sms) === false) {
-            $message = $message.", sms send";
+            $message = $message.", SMS send";
             
             $objects = $this->handleObjectsCreation();
             if (empty($objects) === false) {
@@ -234,14 +234,19 @@ class NotificationsService
             $this->configuration['emailConfig']['getObjectDataConfig']['SMSSameAsEmail'] = $object;
             
             // Todo: do we want to continue sending an email if we didn't find an object?
+            // Todo: (re-use the objectConditions for this, see objectConditions below this & check README description how objectConditions should work).
         }
         
-        // Check objectConditions.
-        if (empty($object) === false && empty($emailConfig['objectConditions']) === false) {
+        // Check objectConditions. todo: duplicate, could be function, see handleSMS()
+        if (empty($emailConfig['objectConditions']) === false) {
+            if (empty($object) === true) {
+                $this->logger->error("Action configuration emailConfig objectConditions failed because no object was found to check objectConditions for.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
+                return null;
+            }
             $objectDot = new Dot($object);
             foreach ($emailConfig['objectConditions'] as $key => $condition) {
                 if ($objectDot->has($key) === false || $objectDot->get($key) != $condition) {
-                    $this->logger->info("Action configuration emailConfig objectConditions are not met, we don't need to send an email.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
+                    $this->logger->info("Action configuration emailConfig objectConditions are not met for: $key, we don't need to send an email.", ['plugin' => 'common-gateway/customer-notifications-bundle', 'condition' => $condition]);
                     return null;
                 }
             }
@@ -255,7 +260,7 @@ class NotificationsService
 
     /**
      * If smsConfig has been configured in the Action->configuration.
-     * This function handles getting info for a sms and throwing the sms event that will trigger the actual sms sending.
+     * This function handles getting info for an SMS and throwing the SMS event that will trigger the actual SMS sending.
      *
      * @return array|null Return data from the thrown event. Or null.
      */
@@ -274,7 +279,7 @@ class NotificationsService
 
         // Let's see if we need to get an object to use its data for creating an SMS message.
         if (empty($smsConfig['getObjectDataConfig']) === false) {
-            // If getObjectDataConfig for sms is configured to re-use the same object as for email, do so.
+            // If getObjectDataConfig for SMS is configured to re-use the same object as for email, do so.
             if ($smsConfig['getObjectDataConfig'] === 'sameAsEmail') {
                 if (empty($this->configuration['emailConfig']['getObjectDataConfig']['SMSSameAsEmail']) === false) {
                     $object = $this->configuration['emailConfig']['getObjectDataConfig']['SMSSameAsEmail'];
@@ -287,21 +292,26 @@ class NotificationsService
                 $object = $this->getObject($smsConfig['getObjectDataConfig']);
             }
             
-            // Todo: do we want to continue sending an sms if we didn't find an object?
+            // Todo: do we want to continue sending an SMS if we didn't find an object?
+            // Todo: (re-use the objectConditions for this, see objectConditions below this & check README description how objectConditions should work).
         }
         
-        // Check objectConditions.
-        if (empty($object) === false && empty($smsConfig['objectConditions']) === false) {
+        // Check objectConditions. todo: duplicate, could be function, see handleEmail()
+        if (empty($smsConfig['objectConditions']) === false) {
+            if (empty($object) === true) {
+                $this->logger->error("Action configuration smsConfig objectConditions failed because no object was found to check objectConditions for.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
+                return null;
+            }
             $objectDot = new Dot($object);
             foreach ($smsConfig['objectConditions'] as $key => $condition) {
                 if ($objectDot->has($key) === false || $objectDot->get($key) != $condition) {
-                    $this->logger->info("Action configuration smsConfig objectConditions are not met, we don't need to send an sms.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
+                    $this->logger->info("Action configuration smsConfig objectConditions are not met for: $key, we don't need to send an SMS.", ['plugin' => 'common-gateway/customer-notifications-bundle', 'condition' => $condition]);
                     return null;
                 }
             }
         }
 
-        // Throw sms event
+        // Throw SMS event
         return $this->throwEvent($smsConfig, ($object ?? null));
 
     }//end handleSMS()
@@ -309,7 +319,7 @@ class NotificationsService
 
     /**
      * If getObjectDataConfig has been configured in the Action->configuration.
-     * This function uses email or SMS configuration to get object data, to use later for email/sms creation (to pass through the event thrown).
+     * This function uses email or SMS configuration to get object data, to use later for email/SMS creation (to pass through the event thrown).
      *
      * @param array $config The EmailConfig or SMSConfig.
      *
@@ -317,7 +327,7 @@ class NotificationsService
      */
     private function getObject(array $config): ?array
     {
-        if ($this->validateConfigArray(['notificationProperty|or|sourceEndpoint', 'searchSchemas', 'searchQuery'], 'email or sms getObjectDataConfig', $config,) === false) {
+        if ($this->validateConfigArray(['notificationProperty|or|sourceEndpoint', 'searchSchemas', 'searchQuery'], 'email or SMS getObjectDataConfig', $config,) === false) {
             return null;
         }
         
@@ -330,12 +340,12 @@ class NotificationsService
 
         $objects = $this->cacheService->searchObjects(null, $filter, $config['searchSchemas']);
         if (empty($objects) === true || count($objects['results']) === 0) {
-            $this->logger->error("Couldn't find an object to use for email and/or sms data.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
+            $this->logger->error("Couldn't find an object to use for email and/or SMS data.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
             return null;
         }
 
         if (count($objects['results']) > 1) {
-            $this->logger->warning("Found more than one object to use for email and/or sms data.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
+            $this->logger->warning("Found more than one object to use for email and/or SMS data.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
         }
         
         // Deal with MongoDBDocuments...
@@ -363,7 +373,7 @@ class NotificationsService
             return null;
         }
         
-        $response = $this->callSource($config, ["getObjectDataConfig (parent or sub'getObjectDataConfig' array)", 'while trying to get object data for email and/or sms']);
+        $response = $this->callSource($config, ["getObjectDataConfig (parent or sub'getObjectDataConfig' array)", 'while trying to get object data for email and/or SMS']);
         $responseDot = new Dot($response);
 
         // Loop through the specific properties we want to use from the response of this source call.
@@ -508,7 +518,7 @@ class NotificationsService
             'source' => $sourceRef,
             'notificationProperty' => "body.$type"
         ];
-        $object = $this->callSource($config, ['emailConfig or smsConfig', "while trying to get $type object for email and/or sms"]);
+        $object = $this->callSource($config, ['emailConfig or smsConfig', "while trying to get $type object for email and/or SMS"]);
         
         $this->configuration['emailConfig'][$type.'Source']['SMSSameAsEmail'] = $object;
         

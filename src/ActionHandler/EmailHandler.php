@@ -55,7 +55,7 @@ class EmailHandler implements ActionHandlerInterface
                 ],
                 'variables'  => [
                     'type'        => 'array',
-                    'description' => 'The variables supported by this template (might contain default vallues)',
+                    'description' => 'The variables supported by this template (can contain default vallues)',
                     'nullable'    => true,
                 ],
                 'sender'     => [

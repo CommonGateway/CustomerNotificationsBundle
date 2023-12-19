@@ -32,13 +32,50 @@ The dockerized method in the terminal and root folder:
 
 ## Configuration for emails and/or SMS
 
-...
+This bundle can be used for (only) sending emails or SMS messages by creating email or SMS specific Common Gateway Actions.
+To do this you will need to create a Common Gateway Action for the `EmailHandler` or `SmsHandler` [ActionHandler](https://commongateway.github.io/CoreBundle/pages/Features/Action_handlers) respectively.
 
-email Action config example \
-For more examples see Actions in the /Installation/Action folder that use the ActionHandler `EmailHandler`.
+### How to create an email or SMS Action
 
-sms Action config example \
-For more examples see Actions in the /Installation/Action folder that use the ActionHandler `SmsHandler`.
+Most of the configuration for these Actions can be configured by using the Gateway admin UI, except for one configuration property: `variables`.
+If you want / need to use or change this Action configuration property: `variables`, we recommended to include your Action directly in the installation files of the bundle ([Common Gateway plugin](https://commongateway.github.io/CoreBundle/pages/Features/Plugins)) you are working with or use an API-platform tool like postman to directly POST (, PATCH or UPDATE) your Action on the Common Gateway you are working with.
+
+So now that you now how to create an email and/or SMS Action, you should also know and understand the requirements of the configuration for one of these (/any) Action:
+
+* A `name`, your Action is going to need a name.
+* A `reference`, each Action needs a unique reference url starting with `https://{your-domain}/action/{short-name-for-your-bundle}` and ending with `.action.json`, something like: `"https://commongateway.nl/action/notifications.ZaakCreatedEmailAction.action.json"`
+* Each Action needs to listen to one or more [Common Gateway events](https://commongateway.github.io/CoreBundle/pages/Features/Events) you can add this to the `listens` array of your Action.
+* Some [JsonLogic](https://jsonlogic.com/) `conditions` that will be compared to the Action data, these conditions determine when your Action should be triggered. Use `{"==": [1, 1]}` for 'always true'.
+* The `class`, this should be `"CommonGateway\CustomerNotificationsBundle\ActionHandler\EmailHandler"` or `"CommonGateway\CustomerNotificationsBundle\ActionHandler\SmsHandler"` for this type of Action.
+* A `configuration` array containing specific configuration for your email or sms Action, probably the most complex thing in this list, so because of that [below](#email-and-sms-action-configuration) this summary/list you will find a more detailed explanation.
+
+### Email and SMS Action configuration
+
+The email and SMS Action configuration are very similar, here is a list of configuration properties that can be used for email and SMS Actions:
+* [**Required**] `serviceDNS` The DNS of the [mail](https://symfony.com/doc/6.2/mailer.html) or [sms](https://symfony.com/doc/current/notifier.html#sms-channel) provider.
+* [**Required**] `template` The template of your email or sms. This should be a base64 encoded [twig template](https://symfony.com/doc/current/templates.html#twig-templating-language). For (not base64 encoded) examples see the [root/src/EmailTemplates folder](https://github.com/CommonGateway/CustomerNotificationsBundle/tree/main/src/EmailTemplates).
+* [**Required**] `sender` The sender. Email for email Action. 'from' string for SMS (example: Gemeente%20Mordor). It is possible to use twig here to add one or multiple variables from the `variables` array.
+* [**Required**] `receiver` The receiver. Email for email Action. Phone number for SMS. It is possible to use twig here to add a variable from the `variables` array.
+* `variables` The variables array, with this you can configure which variables (keys of the `variables` array) can be used in your template and fill these values (values of the `variables` array) by using a dot notation reference to a property in the Action data.
+
+> **Note:**
+> For examples of SMS Actions see all Actions in the [root/Installation/Action folder](https://github.com/commonGateway/customernotificationsBundle/tree/main/Installation/Action) that use the ActionHandler (class) `CommonGateway\CustomerNotificationsBundle\ActionHandler\SMSHandler`.
+
+> **Note:**
+> It is possible to use twig to add variables form the `variables` array in another value in the `variables` array, as long as the variables used are defined earlier/higher in the `variables` array. (See variables.body in [this example](https://github.com/CommonGateway/CustomerNotificationsBundle/blob/main/Installation/Action/notifications.ZaakCreatedEmailAction.action.json)). 
+
+#### Email action specific configuration
+
+The email Action configuration has a few more properties you can use than with the SMS Action configuration.
+For all these properties it is possible to use twig to add one or multiple variables from the `variables` array:
+* [**Required**] `subject` The subject of the email.
+* `cc` Carbon copy, email boxes that should receive a copy of  this mail.
+* `bcc` Blind carbon copy, people that should receive a copy without other recipient knowing.
+* `replyTo` The address the receiver should reply to, only provide this if it differs from the sender address.
+* `priority` An optional priority for the email.
+
+> **Note:**
+> For examples of email Actions see all Actions in the [root/Installation/Action folder](https://github.com/commonGateway/customernotificationsBundle/tree/main/Installation/Action) that use the ActionHandler (class) `CommonGateway\CustomerNotificationsBundle\ActionHandler\EmailHandler`.
 
 ## Configuration for notifications
 
@@ -59,8 +96,8 @@ So now that you now how to create a notification Action, you should also know an
 * A `name`, your Action is going to need a name.
 * A `reference`, each Action needs a unique reference url starting with `https://{your-domain}/action/` and ending with `.action.json`, something like: `"https://commongateway.nl/action/notifications.ZaakCreatedAction.action.json"`
 * Each Action needs to listen to one or more [Common Gateway events](https://commongateway.github.io/CoreBundle/pages/Features/Events) you can add this to the `listens` array of your Action. This will most likely be `["notifications.notification.created"]` if you are working with [ZGW notifications](https://vng-realisatie.github.io/gemma-zaken/themas/achtergronddocumentatie/notificaties).
-* Some `conditions`, these conditions determine when your notification Action should be triggered. And when it triggers it will throw the event that will trigger the Action that sends an email or sms. [Below](#notification-action-conditions) this summary/list you will find an example.
-* The `class`, this should be `"CommonGateway\\CustomerNotificationsBundle\\ActionHandler\\NotificationsHandler"` for your notification Action.
+* Some [JsonLogic](https://jsonlogic.com/) `conditions`, these conditions determine when your notification Action should be triggered. And when it triggers it will throw the event that will trigger the Action that sends an email or sms. [Below](#notification-action-conditions) this summary/list you will find an example.
+* The `class`, this should be `"CommonGateway\CustomerNotificationsBundle\ActionHandler\NotificationsHandler"` for your notification Action.
 * A `configuration` array containing specific configuration for getting and passing information to your email and/or sms Actions, probably the most complex thing in this list, so because of that [below](#notification-action-configuration) this summary/list you will find a more detailed explanation and example.
 
 ### Notification Action conditions
@@ -105,7 +142,7 @@ Here is an example of the conditions for a 'case created' / 'zaak aangemaakt' no
 > In these Action conditions you can use most properties of the Request through the Action data, so besides checking body.bodyProperty you could for example check method=POST as well.
 
 > **Note:**
-> For more examples see all Actions in the root/Installation/Action folder that use the ActionHandler (class) `CommonGateway\CustomerNotificationsBundle\ActionHandler\NotificationsHandler`.
+> For more examples see all Actions in the [root/Installation/Action folder](https://github.com/commonGateway/customernotificationsBundle/tree/main/Installation/Action) that use the ActionHandler (class) `CommonGateway\CustomerNotificationsBundle\ActionHandler\NotificationsHandler`.
 
 In some cases you want to check a little bit more than is possible with only the Action conditions.
 Such as getting and checking information from the ZGW notification hoofdObject or resourceUrl objects.
@@ -173,7 +210,7 @@ Here is a very complex and extensive example of the Action configuration for a '
 ```
 
 > **Note:**
-> For more examples see all Actions in the root/Installation/Action folder that use the ActionHandler (class) `CommonGateway\CustomerNotificationsBundle\ActionHandler\NotificationsHandler`.
+> For more examples see all Actions in the [root/Installation/Action folder](https://github.com/commonGateway/customernotificationsBundle/tree/main/Installation/Action) that use the ActionHandler (class) `CommonGateway\CustomerNotificationsBundle\ActionHandler\NotificationsHandler`.
 
 #### extraConditions
 
@@ -189,16 +226,16 @@ See the example [above](#notification-action-configuration), `"statustype"` is a
 
 `getObjectDataConfig` must always have the properties:
 
-* `source` reference of the source to call.
-* `sourceProperties` properties to use from source response.
+* `source` Reference of the source to call.
+* `sourceProperties` Properties to use from source response.
 * & one of:
-  * `notificationProperty` get url from the notification to call on a source.
-  * `sourceEndpoint` define a specific endpoint to call on a source.
-  * `forParentProperties` in case of recursion add the sourceProperty name here, that has an url in the value, so that can be used to call another (or the same) source.
+  * `notificationProperty` Get url from the notification to call on a source.
+  * `sourceEndpoint` Define a specific endpoint to call on a source.
+  * `forParentProperties` In case of recursion add the sourceProperty name here, that has an url in the value, so that can be used to call another (or the same) source.
 
 But `getObjectDataConfig` can also have the property:
 
-* `sourceQuery` query to use to call the source.
+* `sourceQuery` Query to use to call the source.
 
 #### hoofdObjectSource
 
@@ -217,16 +254,16 @@ This contains the configuration for sending an email after the notification has 
 If not present it will not be possible for emails to be sent.
 
 * `getObjectDataConfig` can be used to configure how to find and add the data of one Common Gateway Object to the email Action data (and email message through the email template).
-* `objectConditions` TODO
+* `objectConditions` can be used to add some final conditions to check using the object found with the `getObjectDataConfig`. If these conditions fail the email will not be sent. (as long as `objectConditions` is not empty, the email will also not be sent if no object was found with `getObjectDataConfig`)
 * `throw` is the event we should throw to trigger another [EmailHandler action](#configuration-for-emails-andor-sms) that will send the actual email.
 
 Basic details about how `getObjectDataConfig` works can be found in the description of the [extraConditions](#extraconditions) property, please take a look at that first.
 Good to know & emailConfig specific properties:
 
-* `source` reference of the source to call.
-* `sourceProperties` this is the array with property names to get from the response of the source.
-* `searchSchemas` array with Schema references to use when searching an Object in de Gateway.
-* `searchQuery` query array to use when searching an Object in de Gateway, use {{sourcePropertyName}} here to insert the values got using `sourceProperties`. See example [above](#notification-action-configuration).
+* `source` Reference of the source to call.
+* `sourceProperties` This is the array with property names to get from the response of the source.
+* `searchSchemas` Array with Schema references to use when searching an Object in de Gateway.
+* `searchQuery` Query array to use when searching an Object in de Gateway, use {{sourcePropertyName}} here to insert the values got using `sourceProperties`. See example [above](#notification-action-configuration).
 
 > **Note:**
 > that it also possible to use `getObjectDataConfig` recursively, see [extraConditions](#extraconditions) for how this is done.
@@ -237,7 +274,7 @@ This contains the configuration for sending an SMS after the notification has be
 If not present it will not be possible for sms to be sent.
 
 * `getObjectDataConfig` can be used to configure how to find and add the data of one Common Gateway Object to the SMS Action data (and SMS message through the SMS template), if set to `"sameAsEmail"` the same object (response from sources) as for email will be used (or the same configuration).
-* `objectConditions` TODO
+* `objectConditions` can be used to add some final conditions to check using the object found with the `getObjectDataConfig`. If these conditions fail the SMS will not be sent. (as long as `objectConditions` is not empty, the sms will also not be sent if no object was found with `getObjectDataConfig`)
 * `throw` is the event we should throw to trigger another [SMSHandler action](#configuration-for-emails-andor-sms) that will send the actual sms.
 
 For more details about how `getObjectDataConfig` works, please see the [emailConfig property](#emailconfig).

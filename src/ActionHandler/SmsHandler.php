@@ -43,7 +43,7 @@ class SmsHandler implements ActionHandlerInterface
             'properties' => [
                 'serviceDNS' => [
                     'type'        => 'string',
-                    'description' => 'The DNS of the sms provider, see https://symfony.com/doc/6.2/smser.html for details',
+                    'description' => 'The DNS of the sms provider, see https://symfony.com/doc/current/notifier.html#sms-channel for details',
                     'example'     => 'native://default',
                     'required'    => true,
                 ],
@@ -55,7 +55,7 @@ class SmsHandler implements ActionHandlerInterface
                 ],
                 'variables'  => [
                     'type'        => 'array',
-                    'description' => 'The variables supported by this template (might contain default values)',
+                    'description' => 'The variables supported by this template (can contain default values)',
                     'nullable'    => true,
                 ],
                 'sender'     => [
