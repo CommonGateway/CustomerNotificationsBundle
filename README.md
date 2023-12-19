@@ -256,7 +256,7 @@ This contains the configuration for sending an email after the notification has 
 If not present it will not be possible for emails to be sent.
 
 * `getObjectDataConfig` can be used to configure how to find and add the data of one Common Gateway Object to the email Action data (and email message through the email template).
-* `objectConditions` can be used to add some final conditions to check using the object found with the `getObjectDataConfig`. If these conditions fail the email will not be sent. (as long as `objectConditions` is not empty, the email will also not be sent if no object was found with `getObjectDataConfig`)
+* `objectConditions` can be used to add some final conditions to check using the object found with the `getObjectDataConfig`. If these conditions fail the email will not be sent. (as long as `objectConditions` is not empty, the email will also not be sent if no object was found with `getObjectDataConfig`).
 * `throw` is the event we should throw to trigger another [EmailHandler action](#configuration-for-emails-andor-sms) that will send the actual email.
 
 Basic details about how `getObjectDataConfig` works can be found in the description of the [extraConditions](#extraconditions) property, please take a look at that first.
@@ -276,7 +276,7 @@ This contains the configuration for sending an SMS after the notification has be
 If not present it will not be possible for sms to be sent.
 
 * `getObjectDataConfig` can be used to configure how to find and add the data of one Common Gateway Object to the SMS Action data (and SMS message through the SMS template), if set to `"sameAsEmail"` the same object (response from sources) as for email will be used (or the same configuration).
-* `objectConditions` can be used to add some final conditions to check using the object found with the `getObjectDataConfig`. If these conditions fail the SMS will not be sent. (as long as `objectConditions` is not empty, the sms will also not be sent if no object was found with `getObjectDataConfig`)
+* `objectConditions` can be used to add some final conditions to check using the object found with the `getObjectDataConfig`. If these conditions fail the SMS will not be sent. (as long as `objectConditions` is not empty, the sms will also not be sent if no object was found with `getObjectDataConfig`).
 * `throw` is the event we should throw to trigger another [SMSHandler action](#configuration-for-emails-andor-sms) that will send the actual sms.
 
 For more details about how `getObjectDataConfig` works, please see the [emailConfig property](#emailconfig).
