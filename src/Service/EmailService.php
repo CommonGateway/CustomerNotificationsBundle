@@ -126,51 +126,54 @@ class EmailService
         $html = $this->twig->createTemplate(base64_decode($this->configuration['template']))->render($variables);
         $text = strip_tags(preg_replace('#<br\s*/?>#i', "\n", $html), '\n');
 
-        // Lets allow the use of values from the object Created/Updated with {attributeName.attributeName} in the these^ strings.
+        // Let's allow the use of values from the object Created/Updated with {attributeName.attributeName} in the these^ strings.
         $subject  = $this->twig->createTemplate($this->configuration['subject'])->render($variables);
         $receiver = $this->twig->createTemplate($this->configuration['receiver'])->render($variables);
         $sender   = $this->twig->createTemplate($this->configuration['sender'])->render($variables);
 
         // If we have no sender, set sender to receiver
-        if (!$sender) {
+        if (empty($sender) === true) {
             $this->logger->error('No sender set, set receiver also as sender', ['plugin' => 'common-gateway/customer-notifications-bundle']);
             $sender = $receiver;
+        }
+
+        // If we have no receiver, set receiver to sender
+        if (empty($receiver) === true) {
+            $this->logger->error('No receiver set, set sender also as receiver', ['plugin' => 'common-gateway/customer-notifications-bundle']);
+            $receiver = $sender;
         }
 
         // Create the email
         $email = (new Email())
             ->from($sender)
             ->to($receiver)
-            // ->cc('cc@example.com')
-            // ->bcc('bcc@example.com')
-            // ->replyTo('fabien@example.com')
-            // ->priority(Email::PRIORITY_HIGH)
             ->subject($subject)
             ->html($html)
             ->text($text);
 
         // Then we can handle some optional configuration
         if (empty($this->configuration['cc']) === false) {
-            $email->cc($this->configuration['cc']);
+            $cc = $this->twig->createTemplate($this->configuration['cc'])->render($variables);
+            $email->cc($cc);
         }
 
         if (empty($this->configuration['bcc']) === false) {
-            $email->bcc($this->configuration['bcc']);
+            $bcc = $this->twig->createTemplate($this->configuration['bcc'])->render($variables);
+            $email->bcc($bcc);
         }
 
         if (empty($this->configuration['replyTo']) === false) {
-            $email->replyTo($this->configuration['replyTo']);
+            $replyTo = $this->twig->createTemplate($this->configuration['replyTo'])->render($variables);
+            $email->replyTo($replyTo);
         }
 
         if (empty($this->configuration['priority']) === false) {
-            $email->priority($this->configuration['priority']);
+            $priority = $this->twig->createTemplate($this->configuration['priority'])->render($variables);
+            $email->priority($priority);
         }
 
         // todo: attachments
         // Send the email
-        /*
-         * @var Symfony\Component\Mailer\SentMessage $sentEmail
-         */
         $mailer->send($email);
 
         return true;

@@ -125,12 +125,12 @@ class SmsService
         $html = $this->twig->createTemplate(base64_decode($this->configuration['template']))->render($variables);
         $text = strip_tags(preg_replace('#<br\s*/?>#i', "\n", $html), '\n');
 
-        // Lets allow the use of values from the object Created/Updated with {attributeName.attributeName} in the these^ strings.
+        // Let's allow the use of values from the object Created/Updated with {attributeName.attributeName} in the these^ strings.
         $receiver = $this->twig->createTemplate($this->configuration['receiver'])->render($variables);
         $sender   = $this->twig->createTemplate($this->configuration['sender'])->render($variables);
 
         // If we have no sender, do not send the SMS
-        if (!$sender) {
+        if (empty($sender) === true) {
             $this->logger->error('No sender set, could not send SMS', ['plugin' => 'common-gateway/customer-notifications-bundle']);
             return false;
         }
