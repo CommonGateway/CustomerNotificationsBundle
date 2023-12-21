@@ -1,6 +1,6 @@
 # CustomerNotificationsBundle [![Codacy Badge](https://app.codacy.com/project/badge/Grade/980ea2efc85a427ea909518f29506ff6)](https://app.codacy.com/gh/CommonGateway/CustomerNotificationsBundle/dashboard?utm_source=gh\&utm_medium=referral\&utm_content=\&utm_campaign=Badge_grade)
 
-A bundle containing logic for handling notifications & sending email/sms messages.
+A bundle containing logic for sending email/sms messages and optionally using notifications as triggers for this.
 
 ### Installation with the Common Gateway admin user-interface
 

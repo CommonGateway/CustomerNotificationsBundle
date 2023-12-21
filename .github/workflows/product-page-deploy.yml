@@ -12,13 +12,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Create or Update publiccode.yaml
-        uses: OpenCatalogi/publiccode-action@latest
-      - name: Create een Productpagina
-        uses: OpenCatalogi/productpage-action@latest
+      - name: Create a Product Page
+        uses: OpenCatalogi/productpage-action@990e1f7f9edc7f89d9479c9ccdf59fda06af709d
         with:
           nl_design_theme_classname: "open-webconcept-theme"
-          pull_from_branche: 'development'
           start_page: 'https://github.com/CommonGateway/CustomerNotificationsBundle/blob/main/README.md'
           jumbotron_image_placement: "right"
-          jumbotron_image_url: "https://raw.githubusercontent.com/CommonGateway/CustomerNotificationsBundle/main/docs/CustomerNotificationsLogo.svg"
+          jumbotron_image_url: "https://raw.githubusercontent.com/CommonGateway/CustomerNotificationsBundle/main/docs/CustomerNotificationsBundleLogo.svg"
+          github_api_base_url: https://api.github.com/repos/CommonGateway/CustomerNotificationsBundle/contents
+          favicon_url: https://openwebconcept.nl/wp-content/uploads/2019/07/cropped-Favicon-32x32.png
+      - name: Create or Update publiccode.yaml
+        uses: OpenCatalogi/publiccode-action@latest
