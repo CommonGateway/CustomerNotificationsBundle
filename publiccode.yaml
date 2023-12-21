@@ -18,23 +18,25 @@ softwareType: softwareAddon
 description:
   en:
     localisedName: null
-    genericName: A bundle containing logic for handling notifications & sending email/sms messages.
-    shortDescription: CustomerNotificationsBundle
-    longDescription: A bundle containing logic for handling notifications & sending email/sms messages.
+    genericName: null
+    shortDescription: "A bundle containing logic for sending email/sms messages, possibly through notifications."
+    longDescription: "A bundle containing logic for sending email/sms messages and optionally using notifications as triggers for this"
     documentation: null
     apiDocumentation: null
-    features: []
+    features:
+      - Common Ground Gateway Plugin
     screenshots: []
     videos: []
     awards: []
   nl:
     localisedName: null
-    genericName: Een bundel met logica voor het afhandelen van notificaties en het verzenden van e-mail/sms-berichten.
-    shortDescription: CustomerNotificationsBundle
-    longDescription: Een bundel met logica voor het afhandelen van notificaties en het verzenden van e-mail/sms-berichten.
+    genericName: null
+    shortDescription: "Een bundel met daarin logica voor het versturen van e-mail/sms berichten, eventueel door notificaties."
+    longDescription: "Een bundel met daarin logica voor het versturen van e-mail/sms berichten en eventueel het gebruik van notificaties als triggers hiervoor"
     documentation: null
     apiDocumentation: null
-    features: []
+    features:
+      - Common Ground Gateway Plugin
     screenshots: []
     videos: []
     awards: []
