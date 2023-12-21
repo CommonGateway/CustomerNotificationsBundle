@@ -18,7 +18,7 @@ jobs:
           nl_design_theme_classname: "open-webconcept-theme"
           start_page: 'https://github.com/CommonGateway/CustomerNotificationsBundle/blob/main/README.md'
           jumbotron_image_placement: "right"
-          jumbotron_image_url: "https://raw.githubusercontent.com/CommonGateway/CustomerNotificationsBundle/main/docs/CustomerNotificationsLogo.svg"
+          jumbotron_image_url: "https://raw.githubusercontent.com/CommonGateway/CustomerNotificationsBundle/main/docs/CustomerNotificationsBundleLogo.svg"
           github_api_base_url: https://api.github.com/repos/CommonGateway/CustomerNotificationsBundle/contents
           favicon_url: https://openwebconcept.nl/wp-content/uploads/2019/07/cropped-Favicon-32x32.png
       - name: Create or Update publiccode.yaml
