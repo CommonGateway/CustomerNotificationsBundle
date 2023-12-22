@@ -1,0 +1,46 @@
+[
+  {
+    "label": "Home",
+    "type": "internal",
+    "current": {
+      "pathname": "/"
+    },
+    "handleClick": {
+      "link": "/"
+    }
+  },
+  {
+    "label": "Classes",
+    "current": {
+      "pathname": "/Classes"
+    },
+    "subItems": [
+      {
+        "label": "README",
+        "type": "internalMarkdown",
+        "current": {
+          "pathname": "/CLasses/README"
+        },
+        "handleClick": {
+          "internalMarkdown": {
+            "directoryName": "Classes",
+            "fileName": "README"
+          }
+        }
+      },
+      {
+        "label": "EmailService",
+        "type": "internalMarkdown",
+        "current": {
+          "pathname": "/Classes/Service/EmailService"
+        },
+        "handleClick": {
+          "internalMarkdown": {
+            "directoryName": "Classes/Service",
+            "fileName": "EmailService"
+          }
+        }
+      }
+    ]
+  }
+]
