@@ -1,107 +1,118 @@
-publiccodeYmlVersion: '0.1'
-name: CustomerNotificationsBundle
 applicationSuite: null
-url: https://github.com/CommonGateway/CustomerNotificationsBundle
-landingURL: null
-isBasedOn: https://github.com/CommonGateway/PetstoreBundle
-softwareVersion: null
-logo: https://avatars.githubusercontent.com/u/106860777?v=4
-monochromeLogo: null
-platforms:
-  - web
-releaseDate: '2022-10-01'
-categories: 
-  - collaboration
-  - it-development
-developmentStatus: beta
-softwareType: softwareAddon
+categories:
+- collaboration
+- it-development
+dependsOn:
+  open:
+  - name: CommonGateway
+    optional: false
+    version: 1.2.47
+    versionMax: 1.3
+    versionMin: 1.2
+  - name: CoreBundle
+    optional: false
+    version: 1.2.47
+    versionMax: 1.3
+    versionMin: 1.2
 description:
   en:
-    localisedName: null
-    genericName: null
-    shortDescription: "A bundle containing logic for sending email/sms messages, possibly through notifications."
-    longDescription: "A bundle containing logic for sending email/sms messages and optionally using notifications as triggers for this"
-    documentation: null
     apiDocumentation: null
-    features:
-      - Common Ground Gateway Plugin
-    screenshots: []
-    videos: []
     awards: []
+    documentation: null
+    features:
+    - Common Ground Gateway Plugin
+    genericName: A bundle containing logic for sending email/sms messages and optionally
+      using notifications as triggers for this.
+    localisedName: null
+    longDescription: A bundle containing logic for sending email/sms messages and
+      optionally using notifications as triggers for this
+    screenshots: []
+    shortDescription: A bundle containing logic for sending email/sms messages, possibly
+      through notifications.
+    videos: []
   nl:
-    localisedName: null
-    genericName: null
-    shortDescription: "Een bundel met daarin logica voor het versturen van e-mail/sms berichten, eventueel door notificaties."
-    longDescription: "Een bundel met daarin logica voor het versturen van e-mail/sms berichten en eventueel het gebruik van notificaties als triggers hiervoor"
-    documentation: null
     apiDocumentation: null
-    features:
-      - Common Ground Gateway Plugin
-    screenshots: []
-    videos: []
     awards: []
-intendedaudience: 
-  countries: 
-    - nl
+    documentation: null
+    features:
+    - Common Ground Gateway Plugin
+    genericName: null
+    localisedName: null
+    longDescription: Een bundel met daarin logica voor het versturen van e-mail/sms
+      berichten en eventueel het gebruik van notificaties als triggers hiervoor
+    screenshots: []
+    shortDescription: Een bundel met daarin logica voor het versturen van e-mail/sms
+      berichten, eventueel door notificaties.
+    videos: []
+developmentStatus: beta
+downloadUrls:
+- https://github.com/CommonGateway/CustomerNotificationsBundle/archive/refs/heads/main.zip
+inputTypes:
+- application/json
+intendedaudience:
+  countries:
+  - nl
+  scope:
+  - government
+  - local-authorities
   unsupportedCountries: []
-  scope: 
-    - government
-    - local-authorities
-legal: 
+isBasedOn: https://github.com/CommonGateway/PetstoreBundle
+landingURL: null
+legal:
+  authorsFile: null
   license: EUPL-1.2-or-later
   mainCopyrightOwner: legal/authorsFile
   repoOwner: CommonGateway
-  authorsFile: null
-maintenance: 
-  type: internal
-  contractors: 
-    - name: Conduction
-      until: 2035-01-01
-      email: info\x64conduction.nl
-      website: https://www.conduction.nl
-  contacts:
-    - name: Ruben van der Linde
-      email: info\x64conduction.nl
-      phone: 085 303 6840
-      affiliation: Conduction
 localisation:
+  availableLanguages:
+  - en
+  - nl
   localisationReady: true
-  availableLanguages: 
-     - en
-     - nl
-dependsOn: 
-  open: 
-    - name: CommonGateway
-      versionMin: 1.2
-      versionMax: 1.3
-      version: 1.2.47
-      optional: false
-    - name: CoreBundle
-      versionMin: 1.2
-      versionMax: 1.3
-      version: 1.2.47
-      optional: false
-roadmap: null
-inputTypes:
-  - application/json
-outputTypes: 
-  - application/json
-  - application/json+hal
-  - application/json+ld
-  - application/xml
-  - application/x-yaml
+logo: https://avatars.githubusercontent.com/u/106860777?v=4
+maintenance:
+  contacts:
+  - affiliation: Conduction
+    email: info\x64conduction.nl
+    name: Ruben van der Linde
+    phone: 085 303 6840
+  contractors:
+  - email: info\x64conduction.nl
+    name: Conduction
+    until: 2035-01-01
+    website: https://www.conduction.nl
+  type: internal
+monochromeLogo: null
+name: CustomerNotificationsBundle
 nl:
   countryExtensionVersion: null
+  upl: []
   vng:
     commonground:
-      intendedOrganisations: [ ]
       installationType: null
+      intendedOrganisations: []
       layerType: service
     gemma:
+      applicatiefunctie: null
       bedrijfsfuncties: []
       bedrijfsservices: []
-      applicatiefunctie: null
       model: null
-  upl: []
-downloadUrls:
-  - https://github.com/CommonGateway/CustomerNotificationsBundle/archive/refs/heads/main.zip
+organisation:
+  description: The common gateway
+  logo: https://avatars.githubusercontent.com/u/106860777?v=4
+  name: CommonGateway
+  url: CommonGateway
+outputTypes:
+- application/json
+- application/json+hal
+- application/json+ld
+- application/xml
+- application/x-yaml
+platforms:
+- web
+publiccodeYmlVersion: '0.1'
+releaseDate: '2022-10-01'
+roadmap: null
+softwareType: softwareAddon
+softwareVersion: null
+url: https://github.com/CommonGateway/CustomerNotificationsBundle
+usedBy: []
