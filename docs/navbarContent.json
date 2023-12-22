@@ -19,7 +19,7 @@
         "label": "README",
         "type": "internalMarkdown",
         "current": {
-          "pathname": "/CLasses/README"
+          "pathname": "/Classes/README"
         },
         "handleClick": {
           "internalMarkdown": {
@@ -32,11 +32,11 @@
         "label": "EmailService",
         "type": "internalMarkdown",
         "current": {
-          "pathname": "/Classes/Service/EmailService"
+          "pathname": "/Service/EmailService"
         },
         "handleClick": {
           "internalMarkdown": {
-            "directoryName": "Classes/Service",
+            "directoryName": "Service",
             "fileName": "EmailService"
           }
         }
