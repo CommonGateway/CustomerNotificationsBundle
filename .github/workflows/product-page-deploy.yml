@@ -15,6 +15,7 @@ jobs:
       - name: Create a Product Page
         uses: OpenCatalogi/productpage-action@latest
         with:
+          github_api_base_url: https://api.github.com/repos/CommonGateway/CustomerNotificationsBundle/contents
           nl_design_theme_classname: "open-webconcept-theme"
           jumbotron_logo: "https://raw.githubusercontent.com/CommonGateway/CustomerNotificationsBundle/main/docs/CustomerNotificationsBundleLogo.svg"
           favicon_url: https://openwebconcept.nl/wp-content/uploads/2019/07/cropped-Favicon-32x32.png
