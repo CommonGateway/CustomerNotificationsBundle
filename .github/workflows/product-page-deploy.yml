@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create a Product Page
-        uses: OpenCatalogi/productpage-action@990e1f7f9edc7f89d9479c9ccdf59fda06af709d
+        uses: OpenCatalogi/productpage-action@latest
         with:
           github_docs_directory_paths: '[{"name": "Services", "location": "/docs/classes/Service"}]'
           nl_design_theme_classname: "open-webconcept-theme"
