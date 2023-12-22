@@ -15,6 +15,7 @@ jobs:
       - name: Create a Product Page
         uses: OpenCatalogi/productpage-action@latest
         with:
+          github_docs_directory_paths: '[{"name": "Classes", "location": "/docs/classes"},{"name": "Service", "location": "/docs/classes/Service"}]'
           github_api_base_url: https://api.github.com/repos/CommonGateway/CustomerNotificationsBundle/contents
           nl_design_theme_classname: "open-webconcept-theme"
           jumbotron_logo: "https://raw.githubusercontent.com/CommonGateway/CustomerNotificationsBundle/main/docs/CustomerNotificationsBundleLogo.svg"

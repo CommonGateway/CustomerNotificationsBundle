@@ -43,7 +43,7 @@
         "ariaLabel": "EmailService",
         "value": "EmailService",
         "internalMarkdown": {
-          "directoryName": "Classes/Service",
+          "directoryName": "Service",
           "fileName": "EmailService"
         }
       }
