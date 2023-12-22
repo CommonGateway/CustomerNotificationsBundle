@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create a Product Page
-        uses: OpenCatalogi/productpage-action@1.0.3
+        uses: OpenCatalogi/productpage-action@latest
         with:
           github_docs_directory_paths: '[{"name": "Services", "location": "/docs/classes/Service"}]'
           nl_design_theme_classname: "open-webconcept-theme"
@@ -22,4 +22,4 @@ jobs:
           navbar_logo: https://openwebconcept.nl/wp-content/themes/openwebconcept/assets/src/images/logo@2x.png
           footer_logo: https://openwebconcept.nl/wp-content/themes/openwebconcept/assets/src/images/logo@2x.png
       - name: Create or Update publiccode.yaml
-        uses: OpenCatalogi/publiccode-action@1.3.0
+        uses: OpenCatalogi/publiccode-action@latest
