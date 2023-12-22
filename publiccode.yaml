@@ -90,17 +90,18 @@ outputTypes:
   - application/json+ld
   - application/xml
   - application/x-yaml
-nl: 
+nl:
   countryExtensionVersion: null
-  commonground: 
-    intendedOrganisations: []
-    installationType: null
-    layerType: service
-  gemma:
-    bedrijfsfuncties: []
-    bedrijfsservices: []
-    applicatiefunctie: null
-    model: null
+  vng:
+    commonground:
+      intendedOrganisations: [ ]
+      installationType: null
+      layerType: service
+    gemma:
+      bedrijfsfuncties: []
+      bedrijfsservices: []
+      applicatiefunctie: null
+      model: null
   upl: []
 downloadUrls:
   - https://github.com/CommonGateway/CustomerNotificationsBundle/archive/refs/heads/main.zip
