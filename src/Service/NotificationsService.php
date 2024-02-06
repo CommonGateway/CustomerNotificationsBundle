@@ -252,6 +252,16 @@ class NotificationsService
 
             $objectDot = new Dot($object);
             foreach ($emailConfig['objectConditions'] as $key => $condition) {
+                $allowEmpty = false;
+                if (str_ends_with($condition, '||empty') === true) {
+                    $allowEmpty = true;
+                    $condition = substr($condition,0, -7);
+                }
+                
+                if ($allowEmpty === true && ($objectDot->has($key) === false || empty($objectDot->get($key)) === true)) {
+                    continue;
+                }
+                
                 if ($objectDot->has($key) === false || $objectDot->get($key) != $condition) {
                     $this->logger->info("Action configuration emailConfig objectConditions are not met for: $key, we don't need to send an email.", ['plugin' => 'common-gateway/customer-notifications-bundle', 'condition' => $condition]);
                     return null;
@@ -312,6 +322,16 @@ class NotificationsService
 
             $objectDot = new Dot($object);
             foreach ($smsConfig['objectConditions'] as $key => $condition) {
+                $allowEmpty = false;
+                if (str_ends_with($condition, '||empty') === true) {
+                    $allowEmpty = true;
+                    $condition = substr($condition,0, -7);
+                }
+                
+                if ($allowEmpty === true && ($objectDot->has($key) === false || empty($objectDot->get($key)) === true)) {
+                    continue;
+                }
+                
                 if ($objectDot->has($key) === false || $objectDot->get($key) != $condition) {
                     $this->logger->info("Action configuration smsConfig objectConditions are not met for: $key, we don't need to send an SMS.", ['plugin' => 'common-gateway/customer-notifications-bundle', 'condition' => $condition]);
                     return null;

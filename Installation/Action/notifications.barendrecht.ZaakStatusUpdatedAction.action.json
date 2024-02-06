@@ -1,0 +1,75 @@
+{
+    "title": "Barendrecht ZaakStatusUpdatedAction",
+    "$id": "https://commongateway.nl/action/notifications.barendrecht.ZaakStatusUpdatedAction.action.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
+    "version": "0.0.1",
+    "listens": ["notifications.notification.created"],
+    "conditions":
+    {
+        "and": [
+            {
+                "in": [
+                    "https://zaken.preprod-rx-services.nl/api/v1",
+                    {
+                        "var": "body.hoofdObject"
+                    }
+                ]
+            },
+            {
+                "==": [
+                    {
+                        "var": "body.kanaal"
+                    },
+                    "zaken"
+                ]
+            },
+            {
+                "==": [
+                    {
+                        "var": "body.resource"
+                    },
+                    "status"
+                ]
+            },
+            {
+                "==": [
+                    {
+                        "var": "body.actie"
+                    },
+                    "update"
+                ]
+            }
+        ]
+    },
+    "class": "CommonGateway\\CustomerNotificationsBundle\\ActionHandler\\NotificationsHandler",
+    "configuration": {
+        "hoofdObjectSource": "https://buren.nl/source/barendrecht.preprod.zrc.source.json",
+        "emailConfig": {
+            "getObjectDataConfig": {
+                "source": "https://buren.nl/source/barendrecht.preprod.zrc.source.json",
+                "sourceEndpoint": "/rollen",
+                "sourceQuery": {
+                    "zaak": "{{body.hoofdObject}}",
+                    "omschrijvingGeneriek": "initiator"
+                },
+                "sourceProperties": ["results.0.betrokkeneIdentificatie.inpBsn"],
+                "searchSchemas": ["https://commongateway.nl/klant.partij.schema.json"],
+                "searchQuery": {
+                    "externeIdentificaties.partijIdentificator.objectId": "{{results.0.betrokkeneIdentificatie.inpBsn}}",
+                    "externeIdentificaties.partijIdentificator.objecttype": "ingeschrevenpersonen"
+                }
+            },
+            "objectConditions": {
+                "embedded.voorkeurskanaal.soortDigitaalAdres": "emailadres"
+            },
+            "throw": "notifications.zaak.status.updated.email"
+        },
+        "smsConfig": {
+            "getObjectDataConfig": "sameAsEmail",
+            "objectConditions": {
+                "embedded.voorkeurskanaal.soortDigitaalAdres": "telefoonnummer"
+            },
+            "throw": "notifications.zaak.status.updated.sms"
+        }
+    }
+}
