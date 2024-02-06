@@ -411,6 +411,7 @@ class NotificationsService
                 if ($conditionsOrFilter === null) {
                     return $this->configuration['extraConditions']['conditions'];
                 }
+
                 $conditionsOrFilter = $this->checkExtraConditions($conditionsOrFilter, $sourceProperty, $sourcePropertyValue);
             }
 
@@ -418,6 +419,7 @@ class NotificationsService
                 if ($conditionsOrFilter === null) {
                     return null;
                 }
+
                 $conditionsOrFilter = $this->addSourceDataToFilter($conditionsOrFilter, $sourceProperty, $sourcePropertyValue);
             }
         }//end foreach
