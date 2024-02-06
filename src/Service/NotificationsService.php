@@ -408,10 +408,16 @@ class NotificationsService
             }
 
             if ($variant === 'extraConditions') {
+                if ($conditionsOrFilter === null) {
+                    return $this->configuration['extraConditions']['conditions'];
+                }
                 $conditionsOrFilter = $this->checkExtraConditions($conditionsOrFilter, $sourceProperty, $sourcePropertyValue);
             }
 
             if ($variant === 'emailOrSMSConfig') {
+                if ($conditionsOrFilter === null) {
+                    return null;
+                }
                 $conditionsOrFilter = $this->addSourceDataToFilter($conditionsOrFilter, $sourceProperty, $sourcePropertyValue);
             }
         }//end foreach
