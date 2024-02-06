@@ -113,6 +113,14 @@ Here is an example of the conditions for a 'case created' / 'zaak aangemaakt' no
 {
     "and": [
         {
+            "in": [
+                "https://open-zaak.test.buren.opengem.nl/zaken/api/v1",
+                {
+                    "var": "body.kanaal"
+                }
+            ]
+        },
+        {
             "==": [
                 {
                     "var": "body.kanaal"
