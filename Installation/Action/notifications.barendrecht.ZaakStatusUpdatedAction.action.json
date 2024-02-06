@@ -1,15 +1,15 @@
 {
-    "title": "ZaakStatusFinishedAction",
-    "$id": "https://commongateway.nl/action/notifications.ZaakStatusFinishedAction.action.json",
+    "title": "Barendrecht ZaakStatusUpdatedAction",
+    "$id": "https://commongateway.nl/action/notifications.barendrecht.ZaakStatusUpdatedAction.action.json",
     "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-    "version": "0.0.3",
+    "version": "0.0.1",
     "listens": ["notifications.notification.created"],
     "conditions":
     {
         "and": [
             {
                 "in": [
-                    "https://open-zaak.test.buren.opengem.nl/zaken/api/v1",
+                    "https://zaken.preprod-rx-services.nl/api/v1",
                     {
                         "var": "body.hoofdObject"
                     }
@@ -43,25 +43,10 @@
     },
     "class": "CommonGateway\\CustomerNotificationsBundle\\ActionHandler\\NotificationsHandler",
     "configuration": {
-        "extraConditions": {
-            "getObjectDataConfig": {
-                "source": "https://buren.nl/source/buren.zrc.source.json",
-                "notificationProperty": "body.resourceUrl",
-                "sourceProperties": ["statustype"],
-                "getObjectDataConfig": {
-                    "forParentProperties": ["statustype"],
-                    "source": "https://buren.nl/source/buren.ztc.source.json",
-                    "sourceProperties": ["isEindstatus"]
-                }
-            },
-            "conditions": {
-                "isEindstatus": true
-            }
-        },
-        "hoofdObjectSource": "https://buren.nl/source/buren.zrc.source.json",
+        "hoofdObjectSource": "https://buren.nl/source/barendrecht.preprod.zrc.source.json",
         "emailConfig": {
             "getObjectDataConfig": {
-                "source": "https://buren.nl/source/buren.zrc.source.json",
+                "source": "https://buren.nl/source/barendrecht.preprod.zrc.source.json",
                 "sourceEndpoint": "/rollen",
                 "sourceQuery": {
                     "zaak": "{{body.hoofdObject}}",
@@ -77,18 +62,14 @@
             "objectConditions": {
                 "embedded.voorkeurskanaal.soortDigitaalAdres": "emailadres"
             },
-            "throw": "notifications.zaak.status.finished.email"
+            "throw": "notifications.zaak.status.updated.email"
         },
         "smsConfig": {
             "getObjectDataConfig": "sameAsEmail",
             "objectConditions": {
                 "embedded.voorkeurskanaal.soortDigitaalAdres": "telefoonnummer"
             },
-            "throw": "notifications.zaak.status.finished.sms"
-        },
-        "createObjectConfig": {
-            "schema": "https://commongateway.nl/klant.klantcontact.schema.json",
-            "mapping": "Mapping ref or uuid"
+            "throw": "notifications.zaak.status.updated.sms"
         }
     }
 }

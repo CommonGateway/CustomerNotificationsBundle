@@ -24,21 +24,21 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class NotificationsService
 {
-    
+
     /**
      * Configuration array.
      *
      * @var array
      */
-    private array $configuration= [];
-    
+    private array $configuration = [];
+
     /**
      * Data array.
      *
      * @var array
      */
     private array $data = [];
-    
+
     /**
      * Data array as an Adbar\Dot object.
      *
@@ -133,13 +133,13 @@ class NotificationsService
         $this->data          = $data;
         $this->dataDot       = new Dot($this->data);
         $this->configuration = $configuration;
-        
+
         $this->logger->debug("NotificationsBundler -> NotificationsService -> notificationsHandler()", ['plugin' => 'common-gateway/customer-notifications-bundle']);
-        
+
         $extraConditions = $this->handleExtraConditions();
         if ($extraConditions !== []) {
             $this->logger->info("Failed to match the following extraConditions for current action", ['plugin' => 'common-gateway/customer-notifications-bundle', 'ExtraConditions' => $extraConditions]);
-            
+
             return $data;
         }
 
@@ -148,7 +148,7 @@ class NotificationsService
         $email = $this->handleEmail();
         if (empty($email) === false) {
             $message = $message.", email send";
-            
+
             $objects = $this->handleObjectsCreation();
             if (empty($objects) === false) {
                 $message = $message." & object(s) created";
@@ -158,7 +158,7 @@ class NotificationsService
         $sms = $this->handleSMS();
         if (empty($sms) === false) {
             $message = $message.", SMS send";
-            
+
             $objects = $this->handleObjectsCreation();
             if (empty($objects) === false) {
                 $message = $message." & object(s) created";
@@ -171,8 +171,8 @@ class NotificationsService
         return $data;
 
     }//end notificationsHandler()
-    
-    
+
+
     /**
      * If the action configuration contains extraConditions, check if these conditions are met.
      *
@@ -184,26 +184,32 @@ class NotificationsService
         if (empty($this->configuration['extraConditions']) === true) {
             return [];
         }
-        
+
         $extraConditions = $this->configuration['extraConditions'];
-        
+
         if ($this->validateConfigArray(['getObjectDataConfig', 'conditions'], 'extraConditions', $extraConditions) === false) {
-            return ['Message' => 'Action->configuration should have the following keys in extraConditions', "extraConditions" => ['getObjectDataConfig', 'conditions']];
+            return [
+                'Message'         => 'Action->configuration should have the following keys in extraConditions',
+                "extraConditions" => [
+                    'getObjectDataConfig',
+                    'conditions',
+                ],
+            ];
         }
-        
+
         $checkedConditions = $this->handleObjectDataConfig(
             $extraConditions['conditions'],
             $extraConditions['getObjectDataConfig'],
             'extraConditions'
         );
-        
+
         // We unset all conditions that have been met, array should be empty at this point.
         if (empty($checkedConditions) === false) {
             return $checkedConditions;
         }
-        
+
         return [];
-        
+
     }//end handleExtraConditions()
 
 
@@ -232,25 +238,36 @@ class NotificationsService
 
             // Set $object in $this->configuration to be re-used in SMSConfig, if configured to do so.
             $this->configuration['emailConfig']['getObjectDataConfig']['SMSSameAsEmail'] = $object;
-            
+
             // Todo: do we want to continue sending an email if we didn't find an object?
             // Todo: (re-use the objectConditions for this, see objectConditions below this & check README description how objectConditions should work).
         }
-        
+
         // Check objectConditions. todo: duplicate, could be function, see handleSMS()
         if (empty($emailConfig['objectConditions']) === false) {
             if (empty($object) === true) {
                 $this->logger->error("Action configuration emailConfig objectConditions failed because no object was found to check objectConditions for.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
                 return null;
             }
+
             $objectDot = new Dot($object);
             foreach ($emailConfig['objectConditions'] as $key => $condition) {
+                $allowEmpty = false;
+                if (str_ends_with($condition, '||empty') === true) {
+                    $allowEmpty = true;
+                    $condition  = substr($condition, 0, -7);
+                }
+
+                if ($allowEmpty === true && ($objectDot->has($key) === false || empty($objectDot->get($key)) === true)) {
+                    continue;
+                }
+
                 if ($objectDot->has($key) === false || $objectDot->get($key) != $condition) {
                     $this->logger->info("Action configuration emailConfig objectConditions are not met for: $key, we don't need to send an email.", ['plugin' => 'common-gateway/customer-notifications-bundle', 'condition' => $condition]);
                     return null;
                 }
             }
-        }
+        }//end if
 
         // Throw email event
         return $this->throwEvent($emailConfig, ($object ?? null));
@@ -283,33 +300,44 @@ class NotificationsService
             if ($smsConfig['getObjectDataConfig'] === 'sameAsEmail') {
                 if (empty($this->configuration['emailConfig']['getObjectDataConfig']['SMSSameAsEmail']) === false) {
                     $object = $this->configuration['emailConfig']['getObjectDataConfig']['SMSSameAsEmail'];
-                } elseif (empty($this->configuration['emailConfig']['getObjectDataConfig']) === false) {
+                } else if (empty($this->configuration['emailConfig']['getObjectDataConfig']) === false) {
                     $smsConfig['getObjectDataConfig'] = $this->configuration['emailConfig']['getObjectDataConfig'];
                 }
             }
-            
+
             if ($smsConfig['getObjectDataConfig'] !== 'sameAsEmail') {
                 $object = $this->getObject($smsConfig['getObjectDataConfig']);
             }
-            
+
             // Todo: do we want to continue sending an SMS if we didn't find an object?
             // Todo: (re-use the objectConditions for this, see objectConditions below this & check README description how objectConditions should work).
         }
-        
+
         // Check objectConditions. todo: duplicate, could be function, see handleEmail()
         if (empty($smsConfig['objectConditions']) === false) {
             if (empty($object) === true) {
                 $this->logger->error("Action configuration smsConfig objectConditions failed because no object was found to check objectConditions for.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
                 return null;
             }
+
             $objectDot = new Dot($object);
             foreach ($smsConfig['objectConditions'] as $key => $condition) {
+                $allowEmpty = false;
+                if (str_ends_with($condition, '||empty') === true) {
+                    $allowEmpty = true;
+                    $condition  = substr($condition, 0, -7);
+                }
+
+                if ($allowEmpty === true && ($objectDot->has($key) === false || empty($objectDot->get($key)) === true)) {
+                    continue;
+                }
+
                 if ($objectDot->has($key) === false || $objectDot->get($key) != $condition) {
                     $this->logger->info("Action configuration smsConfig objectConditions are not met for: $key, we don't need to send an SMS.", ['plugin' => 'common-gateway/customer-notifications-bundle', 'condition' => $condition]);
                     return null;
                 }
             }
-        }
+        }//end if
 
         // Throw SMS event
         return $this->throwEvent($smsConfig, ($object ?? null));
@@ -330,9 +358,9 @@ class NotificationsService
         if ($this->validateConfigArray(['notificationProperty|or|sourceEndpoint', 'searchSchemas', 'searchQuery'], 'email or SMS getObjectDataConfig', $config,) === false) {
             return null;
         }
-        
+
         $filter = $config['searchQuery'];
-        
+
         $filter = $this->handleObjectDataConfig($filter, $config, 'emailOrSMSConfig');
         if ($filter === null) {
             return null;
@@ -347,7 +375,7 @@ class NotificationsService
         if (count($objects['results']) > 1) {
             $this->logger->warning("Found more than one object to use for email and/or SMS data.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
         }
-        
+
         // Deal with MongoDBDocuments...
         return \Safe\json_decode(\Safe\json_encode($objects['results'][0]), true);
 
@@ -360,9 +388,9 @@ class NotificationsService
      * 'emailOrSMSConfig' = This function will update the given $filter array so that it contains the correct filter values.
      * If configured correctly to do so this is a function with recursion.
      *
-     * @param array $conditionsOrFilter The Conditions to check for extraConditions. Or the filter array to update and add data gathered data from one or more Sources to.
-     * @param array $config   The 'getObjectDataConfig' config (For ExtraConditions, EmailConfig, SMSConfig, or config used for recursion).
-     * @param string $variant Enum = ['extraConditions', 'emailOrSMSConfig']. Depending on which type of action->configuration (ObjectDataConfig) we are handling.
+     * @param array  $conditionsOrFilter The Conditions to check for extraConditions. Or the filter array to update and add data gathered data from one or more Sources to.
+     * @param array  $config             The 'getObjectDataConfig' config (For ExtraConditions, EmailConfig, SMSConfig, or config used for recursion).
+     * @param string $variant            Enum = ['extraConditions', 'emailOrSMSConfig']. Depending on which type of action->configuration (ObjectDataConfig) we are handling.
      *
      * @return array|null The updated $conditions array. Or the updated $filter array.
      */
@@ -372,8 +400,8 @@ class NotificationsService
             $this->logger->error("The key sourceProperties does not exist or its value is empty in a getObjectDataConfig array.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
             return null;
         }
-        
-        $response = $this->callSource($config, ["getObjectDataConfig (parent or sub'getObjectDataConfig' array)", 'while trying to get object data for email and/or SMS']);
+
+        $response    = $this->callSource($config, ["getObjectDataConfig (parent or sub'getObjectDataConfig' array)", 'while trying to get object data for email and/or SMS']);
         $responseDot = new Dot($response);
 
         // Loop through the specific properties we want to use from the response of this source call.
@@ -384,43 +412,51 @@ class NotificationsService
             }
 
             $sourcePropertyValue = $responseDot->get($sourceProperty);
-            
+
             // Check for recursion, make sure 'forParentProperties' is present before we can continue with recursion.
             if (empty($config['getObjectDataConfig']) === false && empty($config['getObjectDataConfig']['forParentProperties']) === true) {
                 $this->logger->error("The key forParentProperties does not exist or its value is empty in a getObjectDataConfig->getObjectDataConfig array.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
                 return null;
             }
-            
+
             // Handle recursion, in the case we want to use the value from an object in a source to do another call on a source.
             if (empty($config['getObjectDataConfig']) === false
                 && in_array($sourceProperty, $config['getObjectDataConfig']['forParentProperties']) === true
             ) {
                 $config['getObjectDataConfig']['sourceEndpoint'] = $sourcePropertyValue;
-                $conditionsOrFilter = $this->handleObjectDataConfig($conditionsOrFilter, $config['getObjectDataConfig'], $variant);
+                $conditionsOrFilter                              = $this->handleObjectDataConfig($conditionsOrFilter, $config['getObjectDataConfig'], $variant);
             }
-            
+
             if ($variant === 'extraConditions') {
+                if ($conditionsOrFilter === null) {
+                    return $this->configuration['extraConditions']['conditions'];
+                }
+
                 $conditionsOrFilter = $this->checkExtraConditions($conditionsOrFilter, $sourceProperty, $sourcePropertyValue);
             }
-            
+
             if ($variant === 'emailOrSMSConfig') {
+                if ($conditionsOrFilter === null) {
+                    return null;
+                }
+
                 $conditionsOrFilter = $this->addSourceDataToFilter($conditionsOrFilter, $sourceProperty, $sourcePropertyValue);
             }
-        }
+        }//end foreach
 
         return $conditionsOrFilter;
 
-    }//end addSourceDataToFilter()
-    
-    
+    }//end handleObjectDataConfig()
+
+
     /**
      * Handles logic for handleObjectDataConfig() variant 'extraConditions'.
      * This function checks if given $conditions array contains the $sourceProperty key and if the value for this conditions matches the given $sourcePropertyValue.
      * Will unset $sourceProperty from conditions if the condition has been met.
      *
-     * @param array $conditions The conditions that have to be met.
-     * @param string $sourceProperty The source property to check.
-     * @param mixed $sourcePropertyValue The value for this key to compare.
+     * @param array  $conditions          The conditions that have to be met.
+     * @param string $sourceProperty      The source property to check.
+     * @param mixed  $sourcePropertyValue The value for this key to compare.
      *
      * @return array The updated or unchanged $conditions array.
      */
@@ -430,27 +466,29 @@ class NotificationsService
         if (isset($conditions[$sourceProperty]) === false) {
             return $conditions;
         }
-        
+
         // If conditions isn't met
         if ($conditions[$sourceProperty] != $sourcePropertyValue) {
-            $this->logger->debug("ExtraCondition $sourceProperty doesn't match expected condition.", ['expectedCondition' => $conditions[$sourceProperty],'sourcePropertyValue' => $sourcePropertyValue, 'plugin' => 'common-gateway/customer-notifications-bundle']);
+            $this->logger->debug("ExtraCondition $sourceProperty doesn't match expected condition.", ['expectedCondition' => $conditions[$sourceProperty], 'sourcePropertyValue' => $sourcePropertyValue, 'plugin' => 'common-gateway/customer-notifications-bundle']);
             return $conditions;
         }
-        
+
         // Make sure to unset from $conditions array so we later know conditions where met.
         unset($conditions[$sourceProperty]);
-        
+
         return $conditions;
-    }
-    
+
+    }//end checkExtraConditions()
+
+
     /**
      * Handles logic for handleObjectDataConfig() variant 'emailOrSMSConfig'.
      * This function will check if given $sourceProperty key is present in the given $filter array.
      * Overwrites every {{$sourceProperty}} with the given $sourcePropertyValue.
      *
-     * @param array $filter The filter array to update.
-     * @param string $sourceProperty The source property to check.
-     * @param mixed $sourcePropertyValue The value of the $sourceProperty key.
+     * @param array  $filter              The filter array to update.
+     * @param string $sourceProperty      The source property to check.
+     * @param mixed  $sourcePropertyValue The value of the $sourceProperty key.
      *
      * @return array The updated $filter array.
      */
@@ -460,11 +498,12 @@ class NotificationsService
         foreach ($filter as $key => $value) {
             $filter[$key] = str_replace("{{{$sourceProperty}}}", $sourcePropertyValue, $value);
         }
-        
+
         return $filter;
-    }
-    
-    
+
+    }//end addSourceDataToFilter()
+
+
     /**
      * Throws a Gateway event, used for throwing the email and/or SMS event.
      * Passes the $object array with the thrown event.
@@ -477,34 +516,34 @@ class NotificationsService
     private function throwEvent(array $config, ?array $object): array
     {
         $eventData['notification']['body'] = $this->data['body'];
-        
+
         if (empty($object) === false) {
             $eventData['object'] = $object;
         }
-        
+
         if (empty($this->configuration['hoofdObjectSource']) === false) {
             $eventData['hoofdObject'] = $this->eventAddSourceData($this->configuration['hoofdObjectSource'], 'hoofdObject');
         }
-        
+
         if (empty($this->configuration['resourceUrlSource']) === false) {
             $eventData['resourceUrl'] = $this->eventAddSourceData($this->configuration['resourceUrlSource'], 'resourceUrl');
         }
-        
+
         $event = new ActionEvent('commongateway.action.event', $eventData, $config['throw']);
-        
+
         $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
-        
+
         return $event->getData();
-        
+
     }//end throwEvent()
-    
-    
+
+
     /**
      * Uses given $sourceRef & $type input to callSource() and get data for an object from a Source. (specifically for the hoofdObject url or resourceUrl).
      * Todo: We might need to add some recursion here, in order to do calls on Sources for subobject urls. This would also mean we need to update configuration and Handler configuration descriptions.
      *
      * @param string $sourceRef A reference of a source or the string 'sameAsEmail'. From the action->configuration[emailConfig/smsConfig][hoofdObjectSource/resourceUrlSource].
-     * @param string $type One of: hoofdObject or resourceUrl.
+     * @param string $type      One of: hoofdObject or resourceUrl.
      *
      * @return array|null The object from the source. Or null.
      */
@@ -513,23 +552,24 @@ class NotificationsService
         if (empty($this->configuration['emailConfig'][$type.'Source']['SMSSameAsEmail']) === false) {
             return $this->configuration['emailConfig'][$type.'Source']['SMSSameAsEmail'];
         }
-        
+
         $config = [
-            'source' => $sourceRef,
-            'notificationProperty' => "body.$type"
+            'source'               => $sourceRef,
+            'notificationProperty' => "body.$type",
         ];
         $object = $this->callSource($config, ['emailConfig or smsConfig', "while trying to get $type object for email and/or SMS"]);
-        
+
         $this->configuration['emailConfig'][$type.'Source']['SMSSameAsEmail'] = $object;
-        
+
         return $object;
-    }
-    
+
+    }//end eventAddSourceData()
+
 
     /**
      * Does a $this->callService->call() on a $config['source'], using $this->data[$config['notificationProperty']] as sourceEndpoint.
      *
-     * @param array  $config  A config array containing the 'source' = reference to a source & 'notificationProperty' or 'sourceEndpoint' = a property in the notification body where to find an url, 'notificationProperty' or just the 'sourceEndpoint'.
+     * @param array $config   A config array containing the 'source' = reference to a source & 'notificationProperty' or 'sourceEndpoint' = a property in the notification body where to find an url, 'notificationProperty' or just the 'sourceEndpoint'.
      * @param array $messages Messages to add to any error logs created. [0] will specifically be passed to validateConfigArray() function. [1] will be used for all logs created in this function.
      *
      * @return array|null The decoded response from the call.
@@ -539,7 +579,7 @@ class NotificationsService
         if ($this->validateConfigArray(['source', 'sourceEndpoint|or|notificationProperty'], "$messages[0] ($messages[1])", $config,) === false) {
             return null;
         }
-        
+
         $source = $this->resourceService->getSource($config['source'], 'common-gateway/customer-notifications-bundle');
         if ($source === null) {
             return null;
@@ -550,17 +590,17 @@ class NotificationsService
         }
 
         $endpoint = str_replace($source->getLocation(), '', $config['sourceEndpoint']);
-        
+
         $callConfig = [];
         if (empty($config['sourceQuery']) === false) {
             foreach ($config['sourceQuery'] as $key => $query) {
                 // Todo: replace this if statement & trim() with some fancy regex.
                 if (str_starts_with($query, '{{') === true && str_ends_with($query, '}}')) {
-                    $query = trim($query, '{}');
+                    $query                       = trim($query, '{}');
                     $config['sourceQuery'][$key] = $this->dataDot->get($query);
                 }
             }
-            
+
             $callConfig['query'] = $config['sourceQuery'];
         }
 
@@ -575,63 +615,64 @@ class NotificationsService
         return $decodedResponse;
 
     }//end callSource()
-    
-    
+
+
     /**
      * Checks if given $config array has the $required keys and if not creates an error log.
      *
-     * @param array $required The required keys. May contain a string containing "|or|" for an OneOf option.
-     * @param string $message A string added to the error message. To specify where in the action configuration this config is defined.
-     * @param array $config The config array to check if it contains the $required keys.
+     * @param array  $required The required keys. May contain a string containing "|or|" for an OneOf option.
+     * @param string $message  A string added to the error message. To specify where in the action configuration this config is defined.
+     * @param array  $config   The config array to check if it contains the $required keys.
      *
      * @return bool True if $config array contains $required keys, else false.
      */
     private function validateConfigArray(array $required, string $message, array $config): bool
     {
         $missingKeys = [];
-        
+
         foreach ($required as $requiredItem) {
             if (str_contains($requiredItem, '|or|')) {
-                $oneOf = explode('|or|', $requiredItem);
+                $oneOf       = explode('|or|', $requiredItem);
                 $oneOfFailed = true;
-                
+
                 foreach ($oneOf as $item) {
                     if (empty($config[$item]) === false && $oneOfFailed === false) {
                         $oneOfFailed = true;
                         break;
                     }
-                    
+
                     if (empty($config[$item]) === false) {
                         $oneOfFailed = false;
                     }
                 }
-                
+
                 if ($oneOfFailed === true) {
                     $missingKeys[] = $requiredItem;
                 }
-                
+
                 continue;
-            }
-            
+            }//end if
+
             if (empty($config[$requiredItem]) === true) {
                 $missingKeys[] = $requiredItem;
             }
-        }
-        
+        }//end foreach
+
         if (empty($missingKeys) === false) {
             $this->logger->error(
-                "Action configuration $message is missing the following keys:".implode(',' ,$missingKeys),
+                "Action configuration $message is missing the following keys:".implode(',', $missingKeys),
                 array_merge(
                     $config,
                     ['plugin' => 'common-gateway/customer-notifications-bundle']
                 )
             );
-            
+
             return false;
         }
-        
+
         return true;
-    }
+
+    }//end validateConfigArray()
 
 
     /**
@@ -659,7 +700,7 @@ class NotificationsService
         // Create ObjectEntity
         return [];
 
-    }//end handleObject()
+    }//end handleObjectsCreation()
 
 
 }//end class

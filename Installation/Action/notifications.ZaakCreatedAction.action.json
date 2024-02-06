@@ -2,11 +2,19 @@
     "title": "ZaakCreatedAction",
     "$id": "https://commongateway.nl/action/notifications.ZaakCreatedAction.action.json",
     "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "listens": ["notifications.notification.created"],
     "conditions":
     {
         "and": [
+            {
+                "in": [
+                    "https://open-zaak.test.buren.opengem.nl/zaken/api/v1",
+                    {
+                        "var": "body.hoofdObject"
+                    }
+                ]
+            },
             {
                 "==": [
                     {
