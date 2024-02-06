@@ -255,19 +255,19 @@ class NotificationsService
                 $allowEmpty = false;
                 if (str_ends_with($condition, '||empty') === true) {
                     $allowEmpty = true;
-                    $condition = substr($condition,0, -7);
+                    $condition  = substr($condition, 0, -7);
                 }
-                
+
                 if ($allowEmpty === true && ($objectDot->has($key) === false || empty($objectDot->get($key)) === true)) {
                     continue;
                 }
-                
+
                 if ($objectDot->has($key) === false || $objectDot->get($key) != $condition) {
                     $this->logger->info("Action configuration emailConfig objectConditions are not met for: $key, we don't need to send an email.", ['plugin' => 'common-gateway/customer-notifications-bundle', 'condition' => $condition]);
                     return null;
                 }
             }
-        }
+        }//end if
 
         // Throw email event
         return $this->throwEvent($emailConfig, ($object ?? null));
@@ -325,19 +325,19 @@ class NotificationsService
                 $allowEmpty = false;
                 if (str_ends_with($condition, '||empty') === true) {
                     $allowEmpty = true;
-                    $condition = substr($condition,0, -7);
+                    $condition  = substr($condition, 0, -7);
                 }
-                
+
                 if ($allowEmpty === true && ($objectDot->has($key) === false || empty($objectDot->get($key)) === true)) {
                     continue;
                 }
-                
+
                 if ($objectDot->has($key) === false || $objectDot->get($key) != $condition) {
                     $this->logger->info("Action configuration smsConfig objectConditions are not met for: $key, we don't need to send an SMS.", ['plugin' => 'common-gateway/customer-notifications-bundle', 'condition' => $condition]);
                     return null;
                 }
             }
-        }
+        }//end if
 
         // Throw SMS event
         return $this->throwEvent($smsConfig, ($object ?? null));
