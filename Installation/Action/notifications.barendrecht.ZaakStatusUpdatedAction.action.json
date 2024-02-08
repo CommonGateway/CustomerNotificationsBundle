@@ -2,7 +2,7 @@
     "title": "Barendrecht ZaakStatusUpdatedAction",
     "$id": "https://commongateway.nl/action/notifications.barendrecht.ZaakStatusUpdatedAction.action.json",
     "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "listens": ["notifications.notification.created"],
     "conditions":
     {
