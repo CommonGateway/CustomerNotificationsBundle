@@ -2,7 +2,7 @@
     "title": "Barendrecht ZaakStatusUpdatedAction",
     "$id": "https://commongateway.nl/action/notifications.barendrecht.ZaakStatusUpdatedAction.action.json",
     "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "listens": ["notifications.notification.created"],
     "conditions":
     {
@@ -62,14 +62,14 @@
             "objectConditions": {
                 "embedded.voorkeurskanaal.soortDigitaalAdres": "emailadres"
             },
-            "throw": "notifications.zaak.status.updated.email"
+            "throw": "notifications.barendrecht.zaak.status.updated.email"
         },
         "smsConfig": {
             "getObjectDataConfig": "sameAsEmail",
             "objectConditions": {
                 "embedded.voorkeurskanaal.soortDigitaalAdres": "telefoonnummer"
             },
-            "throw": "notifications.zaak.status.updated.sms"
+            "throw": "notifications.barendrecht.zaak.status.updated.sms"
         }
     }
 }
