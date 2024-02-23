@@ -9,33 +9,21 @@
         "icon": { "prefix": "fas", "icon": "home", "placement": "left" }
       },
       {
-        "ariaLabel": "Documentation",
-        "value": "Documentation",
-        "link": "https://commongateway.readthedocs.io/en/latest/",
-        "icon": { "prefix": "fab", "icon": "readthedocs", "placement": "left" }
-      },
-      {
-        "ariaLabel": "Slack",
-        "value": "Slack",
-        "link": "#",
-        "icon": { "prefix": "fab", "icon": "slack", "placement": "left" }
-      },
-      {
         "ariaLabel": "Github",
         "value": "Github",
-        "link": "https://github.com/CommonGateway/CoreBundle",
+        "link": "https://github.com/commonGateway/customerNotificationsBundle",
         "icon": { "prefix": "fab", "icon": "github", "placement": "left" }
       }
     ]
   },
   {
-    "title": "Classes",
+    "title": "Services",
     "items": [
       {
         "ariaLabel": "Readme",
         "value": "Readme",
         "internalMarkdown": {
-          "directoryName": "Classes",
+          "directoryName": "Service",
           "fileName": "README"
         }
       },
@@ -45,6 +33,30 @@
         "internalMarkdown": {
           "directoryName": "Service",
           "fileName": "EmailService"
+        }
+      },
+      {
+        "ariaLabel": "InstallationService",
+        "value": "InstallationService",
+        "internalMarkdown": {
+          "directoryName": "Service",
+          "fileName": "InstallationService"
+        }
+      },
+      {
+        "ariaLabel": "NotificationsService",
+        "value": "NotificationsService",
+        "internalMarkdown": {
+          "directoryName": "Service",
+          "fileName": "NotificationsService"
+        }
+      },
+      {
+        "ariaLabel": "SmsService",
+        "value": "SmsService",
+        "internalMarkdown": {
+          "directoryName": "Service",
+          "fileName": "SmsService"
         }
       }
     ]

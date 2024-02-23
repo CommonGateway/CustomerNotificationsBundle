@@ -6,6 +6,7 @@ return (object)[
     'classes' => [
         '\CommonGateway\CustomerNotificationsBundle\Service\InstallationService',
         '\CommonGateway\CustomerNotificationsBundle\Service\NotificationsService',
-        '\CommonGateway\CustomerNotificationsBundle\Service\EmailService'
+        '\CommonGateway\CustomerNotificationsBundle\Service\EmailService',
+        '\CommonGateway\CustomerNotificationsBundle\Service\SmsService'
     ],
 ];
