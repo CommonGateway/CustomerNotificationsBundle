@@ -1,4 +1,7 @@
-name: My ProductPage & PublicCode Workflow
+name: My Product Page Workflow
+
+permissions:
+  contents: write
 
 on:
   push:
@@ -6,14 +9,11 @@ on:
       - main
       - master
 
-permissions:
-  contents: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Create a Product Page
+      - name: Deploy Product Github Page
         uses: OpenCatalogi/productpage-action@latest
         with:
           github_repository_name_as_prefix: false
