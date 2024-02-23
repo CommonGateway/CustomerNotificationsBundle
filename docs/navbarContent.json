@@ -10,20 +10,20 @@
     }
   },
   {
-    "label": "Classes",
+    "label": "Services",
     "current": {
-      "pathname": "/Classes"
+      "pathname": "/Service"
     },
     "subItems": [
       {
         "label": "README",
         "type": "internalMarkdown",
         "current": {
-          "pathname": "/Classes/README"
+          "pathname": "/Service/README"
         },
         "handleClick": {
           "internalMarkdown": {
-            "directoryName": "Classes",
+            "directoryName": "Service",
             "fileName": "README"
           }
         }
@@ -38,6 +38,45 @@
           "internalMarkdown": {
             "directoryName": "Service",
             "fileName": "EmailService"
+          }
+        }
+      },
+      {
+        "label": "InstallationService",
+        "type": "internalMarkdown",
+        "current": {
+          "pathname": "/Service/InstallationService"
+        },
+        "handleClick": {
+          "internalMarkdown": {
+            "directoryName": "Service",
+            "fileName": "InstallationService"
+          }
+        }
+      },
+      {
+        "label": "NotificationsService",
+        "type": "internalMarkdown",
+        "current": {
+          "pathname": "/Service/NotificationsService"
+        },
+        "handleClick": {
+          "internalMarkdown": {
+            "directoryName": "Service",
+            "fileName": "NotificationsService"
+          }
+        }
+      },
+      {
+        "label": "SmsService",
+        "type": "internalMarkdown",
+        "current": {
+          "pathname": "/Service/SmsService"
+        },
+        "handleClick": {
+          "internalMarkdown": {
+            "directoryName": "Service",
+            "fileName": "SmsService"
           }
         }
       }
