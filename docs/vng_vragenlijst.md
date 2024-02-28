@@ -6,7 +6,7 @@ Berichtenservice
 
 ## 2 Wat voor type product is het initiatief?
 
-- Toepassing (bruikbare oplossing)
+- Component
 
 ## 3 Indien een toepassing, welke componenten zijn hierin opgenomen?
 
@@ -14,6 +14,7 @@ Berichtenservice
 - Omnichannel communicatieplatform
 - Microservices architectuur
 - Integratie met externe diensten zoals Postex, sociale media en messaging-apps
+- Open Services
 
 ## 4 Indien het initiatief software betreft, is het parallel te gebruiken naast de bestaande software die het moet vervangen?
 
@@ -58,11 +59,11 @@ Fryske Marren
 
 ## 11 Wat is de startdatum van het initiatief
 
-01-06-2023
+01-010-2023
 
 ## 12 Wanneer wordt verwacht dat het initiatief ready for use is? Of sinds wanneer is het initiatief ready for use?
 
-01-11-2023
+01-01-2024
 
 ## 13 Welke organisatie wordt aangehouden als contactorganisatie?
 
@@ -131,7 +132,7 @@ NL-GOV profiel voor cloud events
 
 ## 28 Waar zijn jullie tegenaan gelopen? In zowel ontwikkeling en waar van toepassing bij de implementatie Noem de een tot drie grootste punten
 
-(Te vullen met specifieke uitdagingen of leerpunten die zijn ondervonden tijdens de ontwikkeling en/of implementatie van de Berichtenservice.)
+- Het ominchannel porject van de vng focust te veel op sms en email  
 
 ## 29 Zijn er nog vragen naar aanleiding van dit intakeformulier?
 
