@@ -20,7 +20,7 @@ jobs:
           github_repository_url: https://github.com/CommonGateway/CustomerNotificationsBundle
           github_api_base_url: https://api.github.com/repos/CommonGateway/CustomerNotificationsBundle/contents
           github_docs_directory_paths: '[{"name": "Classes", "location": "/docs/classes"},{"name": "Service", "location": "/docs/classes/Service"}]'
-          slack_url: "false"
+          slack_url: "https://github.com/openwebconcept/"
           read_the_docs_url: "false"
           navbar_content: "https://raw.githubusercontent.com/CommonGateway/CustomerNotificationsBundle/main/docs/navbarContent.json"
           footer_show_logo: true

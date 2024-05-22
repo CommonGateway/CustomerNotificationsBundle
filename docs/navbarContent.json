@@ -10,6 +10,39 @@
     }
   },
   {
+    "label": "Documentatie",
+    "current": {
+      "pathname": "/docs"
+    },
+    "subItems": [
+      {
+        "label": "Installatie",
+        "type": "internalMarkdown",
+        "current": {
+          "pathname": "/docs/Installatie"
+        },
+        "handleClick": {
+          "internalMarkdown": {
+            "fileName": "Installatie"
+          }
+        }
+      }
+      ,
+      {
+        "label": "Kosten",
+        "type": "internalMarkdown",
+        "current": {
+          "pathname": "/docs/Kosten"
+        },
+        "handleClick": {
+          "internalMarkdown": {
+            "fileName": "Kosten"
+          }
+        }
+      }
+    ]
+  },
+  {
     "label": "Services",
     "current": {
       "pathname": "/Service"
