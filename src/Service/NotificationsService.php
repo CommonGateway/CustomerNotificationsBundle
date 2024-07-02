@@ -366,7 +366,7 @@ class NotificationsService
             return null;
         }
 
-        $objects = $this->cacheService->searchObjects(null, $filter, $config['searchSchemas']);
+        $objects = $this->cacheService->searchObjects($filter, $config['searchSchemas']);
         if (empty($objects) === true || count($objects['results']) === 0) {
             $this->logger->error("Couldn't find an object to use for email and/or SMS data.", ['plugin' => 'common-gateway/customer-notifications-bundle']);
             return null;
